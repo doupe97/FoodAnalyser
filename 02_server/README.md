@@ -21,7 +21,7 @@
 - pip3 install requests
 
 ### Start API Server:
-uvicorn server:app --reload
+uvicorn server:app --reload --host 192.168.178.81 --port 8000
 
 ### Object Capture API
 - Creates .obj + texture files:

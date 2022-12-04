@@ -75,6 +75,11 @@ relevantNutrients = [
 
 #endregion
 
+
+@app.get("/alive")
+async def alive():
+    return { "statusCode" : "200" }
+
 @app.post("/upload-image")
 async def UploadImage(file: UploadFile = File(...)):
     try:
