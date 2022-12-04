@@ -1,5 +1,5 @@
 # FoodAnalyser Server API Documentation
-Required Python Version: 3.10.8
+- Required Python Version: 3.10.8
 
 ### Folder structure
 /input = folder for storing the uploaded images
@@ -10,22 +10,22 @@ Required Python Version: 3.10.8
 2. source ./venv/bin/activate
 
 ### API setup python packages:
-pip3 install --upgrade pip
-pip3 install fastapi
-pip3 install uvicorn
-pip3 install python-multipart
-pip3 install -Iv pyvista==0.36.1
-pip3 install pymeshfix
-pip3 install trimesh
-pip3 install boto3
-pip3 install requests
+- pip3 install --upgrade pip
+- pip3 install fastapi
+- pip3 install uvicorn
+- pip3 install python-multipart
+- pip3 install -Iv pyvista==0.36.1
+- pip3 install pymeshfix
+- pip3 install trimesh
+- pip3 install boto3
+- pip3 install requests
 
 ### Start API Server:
 uvicorn server:app --reload
 
 ### Object Capture API
-- Creates .obj + texture files
-./Desktop/AppleObjectCaptureApi Desktop/input Desktop/output -d medium -o sequential -f normal
+- Creates .obj + texture files:
+- ./Desktop/AppleObjectCaptureApi Desktop/input Desktop/output -d medium -o sequential -f normal
 
-- Convert .obj to .usdz
-usdzconvert /Users/nico/Desktop/output/models/baked_mesh.obj (Python 3.7 required)
+- Convert .obj to .usdz:
+- usdzconvert /Users/nico/Desktop/output/models/baked_mesh.obj (Python 3.7 required)
