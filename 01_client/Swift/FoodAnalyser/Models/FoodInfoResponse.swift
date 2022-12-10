@@ -5,6 +5,8 @@ struct FoodInfoResponse: Decodable {
     let label: String
     let confidence: Double
     let density: Double
+    let detailLevel: String
+    let featureSensitivity: String
     let pyvista: LibraryInfo
     let trimesh: LibraryInfo
     let nutrients: Nutrients
@@ -18,6 +20,8 @@ struct FoodInfoResponse: Decodable {
                 title = "Birne"
             case "apple":
                 title = "Apfel"
+            case "orange":
+                title = "Orange"
             case "banana":
                 title = "Banane"
             case "kiwi":
@@ -30,10 +34,14 @@ struct FoodInfoResponse: Decodable {
             general: [
                 FoodInfoItem(iconName: "Object", type: "Objekt", value: title),
                 FoodInfoItem(iconName: "Density", type: "Dichte", value: "\(String(self.density.round())) g/cm3"),
-                FoodInfoItem(iconName: "Volume", type: "Volumen", value: "\(String(self.pyvista.volumeInCM3.round())) cm3"),
-                FoodInfoItem(iconName: "Weight", type: "Gewicht", value: "\(String(self.pyvista.weightInGrams.round())) g"),
+                FoodInfoItem(iconName: "Volume", type: "Volumen (P)", value: "\(String(self.pyvista.volumeInCM3.round())) cm3"),
+                FoodInfoItem(iconName: "Weight", type: "Gewicht (P)", value: "\(String(self.pyvista.weightInGrams.round())) g"),
+                FoodInfoItem(iconName: "Volume", type: "Volumen (T)", value: "\(String(self.trimesh.volumeInCM3.round())) cm3"),
+                FoodInfoItem(iconName: "Weight", type: "Gewicht (T)", value: "\(String(self.trimesh.weightInGrams.round())) g"),
                 FoodInfoItem(iconName: "Kcal", type: "Kcal", value: "\(String(self.nutrients.kcal.round()))"),
-                FoodInfoItem(iconName: "KJ", type: "kJ", value: "\(String(self.nutrients.kJ.round()))")
+                FoodInfoItem(iconName: "KJ", type: "kJ", value: "\(String(self.nutrients.kJ.round()))"),
+                FoodInfoItem(iconName: "Settings", type: "Detail Level", value: "\(String(self.detailLevel))"),
+                FoodInfoItem(iconName: "Settings", type: "Sensitivity", value: "\(String(self.featureSensitivity))")
             ],
             macronutrients: [
                 FoodInfoItem(iconName: "Protein", type: "Protein", value: "\(String(self.nutrients.protein.round())) g"),

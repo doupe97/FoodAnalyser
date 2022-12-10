@@ -38,17 +38,21 @@ class CameraViewController: UIViewController {
     @IBOutlet private weak var previewView: PreviewView!
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var readyButton: UIButton!
-    
-    
+    @IBOutlet weak var detailLevelButton: UIButton!
+    @IBOutlet weak var featureSensitivityButton: UIButton!
     
     // MARK: View Controller Lifecycle Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.setupMenuButtons()
+        
         photoButton.isEnabled = false
         lidarModeButton.isEnabled = false
         readyButton.isEnabled = false
+        detailLevelButton.isEnabled = false
+        featureSensitivityButton.isEnabled = false
         infoLabel.text = "DualCam"
         
         // setup the preview view for photo capture and spinner
@@ -385,7 +389,37 @@ class CameraViewController: UIViewController {
         self.present(vc, animated: false, completion: nil)
     }
     
+    fileprivate func setupMenuButtons() {
+        let tapAction = { (action: UIAction) in }
+        
+        // setup items for detail level menu button
+        self.detailLevelButton.menu = UIMenu(children: [
+            UIAction(title: "Preview", handler: tapAction),
+            UIAction(title: "Reduced", handler: tapAction),
+            UIAction(title: "Medium", state: .on, handler: tapAction),
+            UIAction(title: "Full", handler: tapAction)
+        ])
+        self.detailLevelButton.showsMenuAsPrimaryAction = true
+        
+        // setup items for feature sensitivity menu button
+        self.featureSensitivityButton.menu = UIMenu(children: [
+            UIAction(title: "Normal", handler: tapAction),
+            UIAction(title: "High", handler: tapAction)
+        ])
+        self.featureSensitivityButton.showsMenuAsPrimaryAction = true
+    }
+    
     @IBAction func finishCapturing(_ sender: UIButton) {
+        guard let detailLevel = self.detailLevelButton.menu?.selectedElements.first?.title.lowercased() else {
+            return
+        }
+        print(">>> [INFO] Selected detail level: \(detailLevel)")
+        
+        guard let featureSensitivity = self.featureSensitivityButton.menu?.selectedElements.first?.title.lowercased() else {
+            return
+        }
+        print(">>> [INFO] Selected feature sensitivity: \(featureSensitivity)")
+        
         // shows an alert if the user has finished capturing photos of the object
         let alertController = UIAlertController(
             title: "Hinweis",
@@ -398,6 +432,8 @@ class CameraViewController: UIViewController {
             let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
                 withIdentifier: Constants.SID_VC_Processing) as! ProcessingViewController
             vc.modalPresentationStyle = .fullScreen
+            vc.detailLevel = detailLevel
+            vc.featureSensitivity = featureSensitivity
             self.present(vc, animated: false, completion: nil)
         }
         
@@ -492,6 +528,8 @@ class CameraViewController: UIViewController {
                 self.photoButton.isEnabled = isSessionRunning
                 self.lidarModeButton.isEnabled = isSessionRunning
                 self.readyButton.isEnabled = isSessionRunning
+                self.detailLevelButton.isEnabled = isSessionRunning
+                self.featureSensitivityButton.isEnabled = isSessionRunning
             }
         }
         keyValueObservations.append(keyValueObservation)

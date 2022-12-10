@@ -6,6 +6,9 @@ class ProcessingViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionTextView: UITextView!
     
+    public var detailLevel: String = "medium" // default
+    public var featureSensitivity: String = "normal" // default
+    
     var timer: Timer?
     var isTimerRunning = false
     var currentDescriptionNumber: Int = 0
@@ -34,21 +37,39 @@ class ProcessingViewController: UIViewController {
         self.runTimer()
         
         // request server api
-        self.requestServerApi()
+        self.requestServerApi(detailLevel: self.detailLevel, featureSensitivity: self.featureSensitivity)
     }
     
-    fileprivate func requestServerApi() {
-        // calls the server api for analysing the given object
+    fileprivate func requestServerApi(detailLevel: String, featureSensitivity: String) {
+        // call the server api for analysing the given object
         print(">>> [INFO] Request server api for analysing object")
         
-        // gets the server api url for analysing the object
+        // get the server api url for analysing the object
         guard let url: URL = URL(string: Constants.SRV_API_AnalyseObject) else {
             print(">>> [ERROR] Could not get server api url for analysing object")
             self.showError()
             return
         }
 
-        // creates the request object
+        // create the request object
+        guard var urlComponents = URLComponents(string: url.absoluteString) else {
+            print(">>> [ERROR] Could not create url components")
+            return
+        }
+        
+        // append request url get parameters
+        urlComponents.queryItems = [
+            URLQueryItem(name: "detailLevelOption", value: detailLevel),
+            URLQueryItem(name: "featureSensitivityOption", value: featureSensitivity)
+        ]
+        
+        guard let url = urlComponents.url else {
+            print(">>> [ERROR] Could not create url from url components")
+            return
+        }
+        
+        print(">>> [INFO] Request url: \(url)")
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
