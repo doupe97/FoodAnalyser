@@ -293,15 +293,11 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
         
         #endregion
 
-        #region 6. Delete uploaded images and generated 3D model
+        #region 6. Delete uploaded images
 
         # delete all files in the server api input folder
         for file in os.listdir(pathInputFolder):
             os.remove(os.path.join(pathInputFolder, file))
-
-        # delete all files in the server api output folder
-        for file in os.listdir(pathOutputFolder):
-            os.remove(os.path.join(pathOutputFolder, file))
 
         #endregion
 
