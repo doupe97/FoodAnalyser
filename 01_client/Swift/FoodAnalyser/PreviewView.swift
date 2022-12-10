@@ -5,14 +5,18 @@ class PreviewView: UIView {
     
     var videoPreviewLayer: AVCaptureVideoPreviewLayer {
         guard let layer = layer as? AVCaptureVideoPreviewLayer else {
-            fatalError(">>> [ERROR] Expected AVCaptureVideoPreviewLayer for layer. Check implementation.")
+            fatalError("Expected `AVCaptureVideoPreviewLayer` type for layer. Check PreviewView.layerClass implementation.")
         }
         return layer
     }
     
     var session: AVCaptureSession? {
-        get { return videoPreviewLayer.session }
-        set { self.videoPreviewLayer.session = newValue }
+        get {
+            return videoPreviewLayer.session
+        }
+        set {
+            videoPreviewLayer.session = newValue
+        }
     }
     
     override class var layerClass: AnyClass {

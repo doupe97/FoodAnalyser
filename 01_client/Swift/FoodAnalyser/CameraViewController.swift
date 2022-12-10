@@ -39,8 +39,6 @@ class CameraViewController: UIViewController {
     @IBOutlet weak var infoLabel: UILabel!
     @IBOutlet weak var readyButton: UIButton!
     
-    
-    
     // MARK: View Controller Lifecycle Methods
     
     override func viewDidLoad() {
@@ -97,7 +95,6 @@ class CameraViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // check app permissions
         sessionQueue.async {
             switch self.setupResult {
             case .success:
@@ -138,7 +135,6 @@ class CameraViewController: UIViewController {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        // stop capture session and remove observers
         sessionQueue.async {
             if self.setupResult == .success {
                 self.captureSession.stopRunning()
@@ -152,12 +148,12 @@ class CameraViewController: UIViewController {
     
     
     
+    
     // MARK: Session Management
     
-    fileprivate func configureSession() {
+    private func configureSession() {
         if setupResult != .success { return }
         
-        // configure capture session
         captureSession.beginConfiguration()
         captureSession.sessionPreset = .photo
         
@@ -173,8 +169,8 @@ class CameraViewController: UIViewController {
                     return
                 }
                     
-                // source: https://developer.apple.com/documentation/avfoundation/additional_data_capture/capturing_photos_with_depth
                 // configure lidar device
+                // https://developer.apple.com/documentation/avfoundation/additional_data_capture/capturing_photos_with_depth
                 
                 guard let format = (lidarDevice.formats.last { format in
                     format.formatDescription.dimensions.width == preferredWidthResolution &&
@@ -194,15 +190,16 @@ class CameraViewController: UIViewController {
                 }
                 
                 try lidarDevice.lockForConfiguration()
+                
                 lidarDevice.activeFormat = format
                 lidarDevice.activeDepthDataFormat = depthFormat
+                
                 lidarDevice.unlockForConfiguration()
                 
                 print(">>> [INFO] Using lidar camera device")
                 defaultDevice = lidarDevice
                 
             } else {
-                // configure dual camera setup
                 guard let dualCameraDevice = AVCaptureDevice.default(.builtInDualCamera, for: .video, position: .back) else {
                     print(">>> [ERROR] Dual camera device is unavailable")
                     setupResult = .configurationFailed
@@ -213,7 +210,6 @@ class CameraViewController: UIViewController {
                 defaultDevice = dualCameraDevice
             }
             
-            // commit session configuration
             guard let device = defaultDevice else {
                 print(">>> [ERROR] Default device is unavailable")
                 setupResult = .configurationFailed
@@ -231,7 +227,6 @@ class CameraViewController: UIViewController {
                 }
             }
             
-            // add input to capture session
             if captureSession.canAddInput(deviceInput) {
                 captureSession.addInput(deviceInput)
                 self.deviceInput = deviceInput
@@ -287,7 +282,6 @@ class CameraViewController: UIViewController {
         sessionQueue.async {
             var photoSettings = AVCapturePhotoSettings()
             
-            // configure internal photo output format
             if self.photoOutput.availablePhotoPixelFormatTypes.contains(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange) {
                 photoSettings = AVCapturePhotoSettings(format: [
                     kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
@@ -320,6 +314,9 @@ class CameraViewController: UIViewController {
                     self.previewView.videoPreviewLayer.opacity = 0
                     UIView.animate(withDuration: 0.25) {
                         self.previewView.videoPreviewLayer.opacity = 1
+                        /*let newPhotoCounterValue = String("\((Int(self.photoCounter.text ?? "0") ?? 0) + 1)")
+                        self.photoCounter.text = newPhotoCounterValue
+                        print(">>> [INFO] Photo counter: \(newPhotoCounterValue)")*/
                     }
                 }
             }, completionHandler: { photoCaptureProcessor in
@@ -357,7 +354,6 @@ class CameraViewController: UIViewController {
     // MARK: Button Functions
 
     @IBAction func toggleLidarMode(_ lidarModeButton: UIButton) {
-        // function toggles between lidar and dual camera setup
         sessionQueue.async {
             self.lidarMode = (self.lidarMode == .on) ? .off : .on
             let lidarMode = self.lidarMode
@@ -378,54 +374,47 @@ class CameraViewController: UIViewController {
     }
     
     @IBAction func showInfoView(_ sender: UIButton) {
-        // shows instruction view controller
-        let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
+        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(
             withIdentifier: Constants.SID_VC_Instruction) as! InstructionViewController
         vc.modalPresentationStyle = .fullScreen
         self.present(vc, animated: false, completion: nil)
     }
     
     @IBAction func finishCapturing(_ sender: UIButton) {
-        // shows an alert if the user has finished capturing photos of the object
         let alertController = UIAlertController(
             title: "Hinweis",
             message: "Sind Sie mit der Aufnahme der Bilder fertig und wollen mit der Verarbeitung bzw. Analyse fortfahren?",
             preferredStyle: .alert)
-        
+
         let cancelAction = UIAlertAction(title: "Nein", style: .cancel, handler: nil)
         let acceptAction = UIAlertAction(title: "Ja", style: .default) { (_) -> Void in
-            // navigates to the processing view controller
-            let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
+            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(
                 withIdentifier: Constants.SID_VC_Processing) as! ProcessingViewController
             vc.modalPresentationStyle = .fullScreen
             self.present(vc, animated: false, completion: nil)
         }
-        
+
         alertController.addAction(cancelAction)
         alertController.addAction(acceptAction)
-        
-        // present the alert in the ui
         self.present(alertController, animated: true, completion: nil)
     }
     
     
     // MARK: Functions for image upload
     
-    fileprivate func uploadImage(_ imageData: Data) {
-        // get the server api url for uploading an image
+    func uploadImage(_ imageData: Data) {
+        
         guard let url: URL = URL(string: Constants.SRV_API_UploadImage) else {
             print(">>> [ERROR] Could not get server api url for image upload")
             return
         }
         
-        // create unique UUID for image file and media type for upload
         let fileName = UUID().uuidString
         guard let mediaImage = Media(imageData: imageData, fileName: fileName, key: "file") else {
             print(">>> [ERROR] Could not create media image")
             return
         }
         
-        // create request object
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
@@ -433,15 +422,12 @@ class CameraViewController: UIViewController {
         
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
-        // define request body
         let dataBody = createDataBody(media: [mediaImage], boundary: boundary)
         request.httpBody = dataBody
         
-        // call server api for image uploading
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
                 do {
-                    // if success, serialize response to JSON
                     let json = try JSONSerialization.jsonObject(with: data, options: [])
                     let result = "\(json)"
                     if result.contains("200") {
@@ -458,11 +444,10 @@ class CameraViewController: UIViewController {
                     print(">>> [ERROR] Failed to upload image due to: '\(error)'")
                 }
             }
-        }.resume()
+            }.resume()
     }
     
-    fileprivate func createDataBody(media: [Media]?, boundary: String) -> Data {
-        // function creates and returns the request data body for image uploading
+    func createDataBody(media: [Media]?, boundary: String) -> Data {
         let lineBreak = "\r\n"
         var body = Data()
         
@@ -484,21 +469,49 @@ class CameraViewController: UIViewController {
     
     // MARK: KVO and Notifications
     
-    fileprivate func addObservers() {
-        // function activates the ui components if the capture session is running
+    private func addObservers() {
         let keyValueObservation = captureSession.observe(\.isRunning, options: .new) { _, change in
+            
             guard let isSessionRunning = change.newValue else { return }
-            DispatchQueue.main.async {
-                self.photoButton.isEnabled = isSessionRunning
-                self.lidarModeButton.isEnabled = isSessionRunning
-                self.readyButton.isEnabled = isSessionRunning
+            
+            // check if server api is running
+            if let url = URL(string: Constants.SRV_API_Alive) {
+                var isApiAlive: Bool = false
+                
+                let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+                    isApiAlive = (data != nil)
+                    
+                    DispatchQueue.main.async {
+                        if isApiAlive {
+                            print(">>> [INFO] Server API is online")
+                            self.photoButton.isEnabled = isSessionRunning
+                            self.lidarModeButton.isEnabled = isSessionRunning
+                            self.readyButton.isEnabled = isSessionRunning
+                        } else {
+                            print(">>> [INFO] Server API is offline")
+                            
+                            self.photoButton.isEnabled = false
+                            self.lidarModeButton.isEnabled = false
+                            self.readyButton.isEnabled = false
+                            
+                            let alertController = UIAlertController(
+                                title: "Hinweis",
+                                message: "Die Server API ist nicht erreichbar. Stellen Sie sicher, dass die API erreichbar ist.",
+                                preferredStyle: .alert)
+
+                            alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                            self.present(alertController, animated: true, completion: nil)
+                        }
+                    }
+                    
+                }
+                task.resume()
             }
         }
         keyValueObservations.append(keyValueObservation)
     }
     
-    fileprivate func removeObservers() {
-        // function deactivates the ui components if the capture session has been finished
+    private func removeObservers() {
         NotificationCenter.default.removeObserver(self)
         
         for keyValueObservation in keyValueObservations {
@@ -512,8 +525,7 @@ class CameraViewController: UIViewController {
     
     // MARK: Trick Volume Event For Automatic Photo Capture
     
-    fileprivate func registerVolumeButtonObserver() {
-        // function registrates a custom observer for controlling the system volume output
+    private func registerVolumeButtonObserver() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setActive(true, options: [])
@@ -526,7 +538,6 @@ class CameraViewController: UIViewController {
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "outputVolume" {
-            // get the current audio sessions output volume
             let audioSession = AVAudioSession.sharedInstance()
             audioLevel = audioSession.outputVolume
             
@@ -535,7 +546,7 @@ class CameraViewController: UIViewController {
                 capturePhoto(self.photoButton)
             }
             
-            // reset audio volume if volume reaches max level
+            // reset system volume level if volume level reaches max
             if audioSession.outputVolume > 0.9 {
                 MPVolumeView.setVolume(0.2)
                 audioLevel = 0.2
