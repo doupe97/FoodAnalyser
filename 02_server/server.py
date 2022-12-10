@@ -28,13 +28,13 @@ pathModelFile = f"{pathOutputFolder}/baked_mesh.obj"
 densityCsvFilePath = "/Users/nico/Desktop/FoodAnalyser/02_server/density.csv"
 
 # object capture api detail level (preview, reduced, medium, full, raw)
-detailLevel = "medium"
+detailLevel = "medium" # default
 
 # object capture api sample ordering (unordered, sequential)
-sampleOrdering = "sequential"
+sampleOrdering = "sequential" # default
 
 # object capture api feature sensitivity (normal, high)
-featureSensitivity = "normal"
+featureSensitivity = "normal" # default
 
 # search api url for food data central
 foodDataCentralApiUrl = "https://api.nal.usda.gov/fdc/v1/foods/search"
@@ -103,7 +103,7 @@ async def UploadImage(file: UploadFile = File(...)):
 
 # endpoint for analysing an object
 @app.get("/analyse-object")
-async def AnalyseObject():
+async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
     try:
         #region 1. Identify object by image classification API
         
@@ -193,9 +193,19 @@ async def AnalyseObject():
 
         #region 3. Generate the 3D model by Object Capture API
         
+        # set detail level parameter for object capture api
+        dl = detailLevel # default = medium
+        if detailLevelOption:
+            dl = detailLevelOption
+
+        # set feature sensitivity parameter for object capture api
+        fs = featureSensitivity # default = normal
+        if featureSensitivityOption:
+            fs = featureSensitivityOption
+        
         # call object capture api as command executable
         cp = subprocess.run(
-            [f"{pathExecutable} {pathInputFolder} {pathOutputFolder} -d {detailLevel} -o {sampleOrdering} -f {featureSensitivity}"],
+            [f"{pathExecutable} {pathInputFolder} {pathOutputFolder} -d {dl} -o {sampleOrdering} -f {fs}"],
             check=True,
             shell=True,
             stdout=subprocess.PIPE,
@@ -285,13 +295,13 @@ async def AnalyseObject():
 
         #region 6. Delete uploaded images and generated 3D model
 
-        # delete the server api input folder
-        #for file in os.listdir(pathInputFolder):
-        #    os.remove(os.path.join(pathInputFolder, file))
+        # delete all files in the server api input folder
+        for file in os.listdir(pathInputFolder):
+            os.remove(os.path.join(pathInputFolder, file))
 
-        # delete the server api output folder
-        #for file in os.listdir(pathOutputFolder):
-        #    os.remove(os.path.join(pathOutputFolder, file))
+        # delete all files in the server api output folder
+        for file in os.listdir(pathOutputFolder):
+            os.remove(os.path.join(pathOutputFolder, file))
 
         #endregion
 
@@ -300,6 +310,8 @@ async def AnalyseObject():
             "label" : objectLabel,
             "confidence" : objectLabelConfidence,
             "density" : objectDensity,
+            "detailLevel": dl,
+            "featureSensitivity": fs,
             "pyvista": {
                 "usedLibrary" : "PyVista v0.36.1",
                 "volumeInCM3" : pyvistaVolumeCM3,
