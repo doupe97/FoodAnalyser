@@ -74,9 +74,9 @@ class ProcessingViewController: UIViewController {
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        // increase default timeout limit because the 3d model generation process takes longer than 60 sec.
+        // increase default timeout limit because the 3d model generation process takes longer than 60 sec. (default)
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 900 // 15 min.
+        configuration.timeoutIntervalForRequest = 3600 // 60 min.
         
         // create session with custom configuration
         let session = URLSession(configuration: configuration)
