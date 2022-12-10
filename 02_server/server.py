@@ -7,41 +7,46 @@ import trimesh
 import boto3
 import requests
 from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import FileResponse
 
+# setup the fast api app
 app = FastAPI()
 
 #region Configuration
 
+# aws rekognition api parameters
 awsApiService = "rekognition"
 awsApiRegion = "eu-central-1"
-awsApiAccessKeyId = ""
-awsApiSecretKey = ""
+awsApiAccessKeyId = "AKIAYTMG3KDEHZLDPCOP"
+awsApiSecretKey = "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"
 
-densityCsvFilePath = "/Users/nico/Desktop/FoodAnalyser/02_server/density.csv"
-
+# local parameters
 pathExecutable = "/Users/nico/Desktop/FoodAnalyser/02_server/ObjectCaptureApi"
 pathInputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/input"
 pathOutputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/output"
 pathModelFile = f"{pathOutputFolder}/baked_mesh.obj"
+densityCsvFilePath = "/Users/nico/Desktop/FoodAnalyser/02_server/density.csv"
 
-# detail level: preview, reduced, medium, full, raw
+# object capture api detail level (preview, reduced, medium, full, raw)
 detailLevel = "medium"
 
-# sample ordering: unordered, sequential
+# object capture api sample ordering (unordered, sequential)
 sampleOrdering = "sequential"
 
-# feature sensitivity: normal, high
+# object capture api feature sensitivity (normal, high)
 featureSensitivity = "normal"
 
+# search api url for food data central
 foodDataCentralApiUrl = "https://api.nal.usda.gov/fdc/v1/foods/search"
-  
+
+# food data central request
 foodDataCentralApiParams = {
     "dataType" : "SR Legacy",
     "pageSize" : "1",
     "pageNumber" : "1",
     "sortBy" : "dataType.keyword",
     "sortOrder" : "asc",
-    "api_key" : ""
+    "api_key" : "AIU73hcuBV0CSApK6s3qkzgV3tWfYjUaHFuH1cig"
 }
 
 # list with all relevant nutrients
@@ -75,25 +80,28 @@ relevantNutrients = [
 
 #endregion
 
-
+# endpoint for checking the servers availability
 @app.get("/alive")
-async def alive():
-    return { "statusCode" : "200" }
+async def Alive():
+    return { "statusCode" : 200 }
 
+# endpoint for uploading an image
 @app.post("/upload-image")
 async def UploadImage(file: UploadFile = File(...)):
     try:
+        # store received (uploaded) image on local disk
         with open(f'{pathInputFolder}/{file.filename}', 'wb') as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        return { "statusCode" : "200" }
+        return { "statusCode" : 200 }
         
     except Exception as e:
         return {
-            "statusCode" : "500",
+            "statusCode" : 500,
             "errorMessage" : f"Could not upload image due to: '{e}'"
         }
 
+# endpoint for analysing an object
 @app.get("/analyse-object")
 async def AnalyseObject():
     try:
@@ -102,26 +110,27 @@ async def AnalyseObject():
         dirList = os.listdir(pathInputFolder)
         if len(dirList) == 0:
             return {
-                "statusCode" : "500",
+                "statusCode" : 500,
                 "errorMessage" : "No input images could be found. Please upload input images first."
             }
         
+        # create path variables
         pathInputImageHeic = f"{pathInputFolder}/{dirList[0]}"
-        pathInputImageJpg = pathInputImageHeic.replace(".HEIC", ".jpg")
+        pathInputImageJpg = pathInputImageHeic.replace(".heic", ".jpg")
 
         # convert image format from .heic to .jpg
         cp = subprocess.run(
-                    [f"magick {pathInputImageHeic} {pathInputImageJpg}"],
-                    check=True,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
+            [f"magick {pathInputImageHeic} {pathInputImageJpg}"],
+            check=True,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
 
         # check if jpg image file exists
         if os.path.exists(pathInputImageJpg) == False:
             return {
-                "statusCode" : "500",
+                "statusCode" : 500,
                 "errorMessage" : "Could not convert image from .heic to .jpg format."
             }
 
@@ -155,7 +164,7 @@ async def AnalyseObject():
 
         if objectLabel == "":
             return {
-                "statusCode" : "500",
+                "statusCode" : 500,
                 "errorMessage" : f"Could not identify the input object."
             }
 
@@ -163,6 +172,7 @@ async def AnalyseObject():
 
         #region 2. Get density information about the object
 
+        # get density information from .csv file and create dictionary
         densityDict = {}
         with open(densityCsvFilePath) as csvFile:
             reader = csv.reader(csvFile)
@@ -170,11 +180,12 @@ async def AnalyseObject():
                 arr = row[0].split(";")
                 densityDict[arr[0]] = arr[1]
 
+        # extract density information for given object from dictionary
         objectDensity = float(densityDict[objectLabel])
 
         if not objectDensity:
             return {
-                "statusCode" : "500",
+                "statusCode" : 500,
                 "errorMessage" : "Could not get object density information."
             }
 
@@ -191,11 +202,11 @@ async def AnalyseObject():
             stderr=subprocess.PIPE
         )
 
-        # check if generated 3D model file exists
+        # check if generated OBJ 3D model file exists
         if os.path.exists(pathModelFile) == False:
             return {
-                "statusCode" : "500",
-                "errorMessage" : "Could not generate 3D model."
+                "statusCode" : 500,
+                "errorMessage" : "Could not generate OBJ 3D model."
             }
 
         #endregion
@@ -219,7 +230,7 @@ async def AnalyseObject():
 
         #region 5. Fetch food nutrient information by FoodData Central API
 
-        # call the FoodData Central API
+        # call the FoodData Central api
         foodDataCentralApiParams["query"] = objectLabel.lower().strip()
         response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
         data = response.json()
@@ -227,16 +238,18 @@ async def AnalyseObject():
         if not data:
             print("No data found")
 
+        # extract raw food nutrients from api response
         nutrientsRaw = data["foods"][0]["foodNutrients"]
         nutrients = {}
 
         for nutrient in nutrientsRaw:
             nutrientName = nutrient["nutrientName"].lower()
             if any(substring in nutrientName for substring in relevantNutrients):
-                
-                # transform nutrient key for dictionary
+                #region transform nutrient information
+
                 if nutrientName == "total lipid (fat)":
                     nutrientName = "fat"
+
                 nutrientName = nutrientName.split(", ", 1)[0]
                 nutrientName = nutrientName.split(" (", 1)[0]
 
@@ -246,12 +259,25 @@ async def AnalyseObject():
                 elif nutrient["nutrientId"] == 1008:
                     nutrientName = "kcal"
 
+                if nutrientName == "carbohydrate":
+                    nutrientName = "carbohydrates"
+
+                # remove spaces in nutrient name
+                arrSpace = nutrientName.split(" ", 1)
+                if len(arrSpace) == 2:
+                    nutrientName = arrSpace[0] + arrSpace[1].upper()
+
+                # remove hyphen in nutrient name
+                nutrientName = nutrientName.replace("-", "")
+
+                #endregion
+
                 # calculate real object nutrients by object weight
                 nutrients[nutrientName] = (pyvistaWeightInGrams * nutrient["value"]) / 100
 
         if not nutrients or len(nutrients) == 0:
             return {
-                "statusCode" : "500",
+                "statusCode" : 500,
                 "errorMessage" : "Could not fetch nutrient information from FoodData Central API."
             }
         
@@ -259,16 +285,18 @@ async def AnalyseObject():
 
         #region 6. Delete uploaded images and generated 3D model
 
-        for file in os.listdir(pathInputFolder):
-            os.remove(os.path.join(pathInputFolder, file))
+        # delete the server api input folder
+        #for file in os.listdir(pathInputFolder):
+        #    os.remove(os.path.join(pathInputFolder, file))
 
-        for file in os.listdir(pathOutputFolder):
-            os.remove(os.path.join(pathOutputFolder, file))
+        # delete the server api output folder
+        #for file in os.listdir(pathOutputFolder):
+        #    os.remove(os.path.join(pathOutputFolder, file))
 
         #endregion
 
         return {
-            "statusCode" : "200",
+            "statusCode" : 200,
             "label" : objectLabel,
             "confidence" : objectLabelConfidence,
             "density" : objectDensity,
@@ -287,6 +315,25 @@ async def AnalyseObject():
 
     except Exception as e:
         return {
-            "statusCode" : "500",
+            "statusCode" : 500,
             "errorMessage" : f"Could not analyse the input object due to: '{e}'"
+        }
+
+# endpoint for getting the generated 3d model file
+@app.get("/get-3d-model", response_class=FileResponse)
+async def Get3DModel():
+    try:
+        # check if 3d model file exists on local disk
+        if os.path.exists(pathModelFile) == False:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not find source OBJ 3D model."
+            }
+
+        return pathModelFile
+    
+    except Exception as e:
+        return {
+            "statusCode" : 500,
+            "errorMessage" : f"Could not get OBJ 3D model due to: '{e}'"
         }

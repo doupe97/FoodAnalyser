@@ -28,4 +28,6 @@ uvicorn server:app --reload --host 192.168.178.81 --port 8000
 - ./Desktop/AppleObjectCaptureApi Desktop/input Desktop/output -d medium -o sequential -f normal
 
 - Convert .obj to .usdz:
-- usdzconvert /Users/nico/Desktop/output/models/baked_mesh.obj (Python 3.7 required)
+- export PATH=$PATH:/Applications/usdpython/USD:$PATH:/Applications/usdpython/usdzconvert;
+- export PYTHONPATH=$PYTHONPATH:/Applications/usdpython/USD/lib/python;
+- /Applications/usdpython/usdzconvert/usdzconvert /Users/nico/Desktop/FoodAnalyser/02_server/output/baked_mesh.obj
