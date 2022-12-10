@@ -296,8 +296,8 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
         #region 6. Delete uploaded images
 
         # delete all files in the server api input folder
-        for file in os.listdir(pathInputFolder):
-            os.remove(os.path.join(pathInputFolder, file))
+        #for file in os.listdir(pathInputFolder):
+        #    os.remove(os.path.join(pathInputFolder, file))
 
         #endregion
 
