@@ -112,6 +112,10 @@ class ProcessingViewController: UIViewController {
                     self.showError()
                     return
                 }
+            } else {
+                print(">>> [ERROR] Could not get raw response data")
+                self.showError()
+                return
             }
         }
         task.resume()
