@@ -1,6 +1,6 @@
-import AVFoundation
-import Photos
 import UIKit
+import Photos
+import AVFoundation
 
 class PhotoCaptureProcessor: NSObject {
     
@@ -11,6 +11,7 @@ class PhotoCaptureProcessor: NSObject {
     public var photoData: Data?
     private var maxPhotoProcessingTime: CMTime?
 
+    // initializer / constructor
     init(with requestedPhotoSettings: AVCapturePhotoSettings,
          willCapturePhotoAnimation: @escaping () -> Void,
          completionHandler: @escaping (PhotoCaptureProcessor) -> Void,
@@ -22,6 +23,7 @@ class PhotoCaptureProcessor: NSObject {
         self.photoProcessingHandler = photoProcessingHandler
     }
     
+    // function calls the completion handler
     private func didFinish() {
         completionHandler(self)
     }
@@ -29,18 +31,18 @@ class PhotoCaptureProcessor: NSObject {
 
 extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
     
+    // function gets called when photo capturing process will starting
     func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
         maxPhotoProcessingTime = resolvedSettings.photoProcessingTimeRange.start + resolvedSettings.photoProcessingTimeRange.duration
     }
     
+    // function gets called when photo capturing process is starting
     func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
         
-        // screen flashing animation
+        // calls completionHandler which makes the screen flashing (animation)
         willCapturePhotoAnimation()
         
-        guard let maxPhotoProcessingTime = maxPhotoProcessingTime else {
-            return
-        }
+        guard let maxPhotoProcessingTime = maxPhotoProcessingTime else { return }
         
         // shows spinner if processing time exceeds one second
         let oneSecond = CMTime(seconds: 1, preferredTimescale: 1)
@@ -49,6 +51,7 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
         }
     }
     
+    // function gets called when the photo processing has been finished
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         photoProcessingHandler(false)
 
@@ -56,12 +59,13 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
             print(">>> [ERROR] Failed capturing photo: \(error)")
             return
         } else {
-            // fileDataRepresentation = https://developer.apple.com/documentation/avfoundation/avcapturephoto/2873919-filedatarepresentation
-            // photo and depth map included
+            // source: https://developer.apple.com/documentation/avfoundation/avcapturephoto/2873919-filedatarepresentation
+            // photo.fileDataRepresentation includes photo and depth map
             photoData = photo.fileDataRepresentation()
         }
     }
     
+    // function gets called when the photo capturing process has been finished
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings, error: Error?) {
         if let error = error {
             print(">>> [ERROR] Failed capturing photo: \(error)")
@@ -75,23 +79,25 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
             return
         }
 
-        // https://developer.apple.com/documentation/avfoundation/photo_capture/capturing_still_and_live_photos/saving_captured_photos
+        // source: https://developer.apple.com/documentation/avfoundation/photo_capture/capturing_still_and_live_photos/saving_captured_photos
+        // stores taken image in local device system photo library
         PHPhotoLibrary.requestAuthorization { status in
+            // check app permissions on PHPhotoLibrary
             if status == .authorized {
                 PHPhotoLibrary.shared().performChanges({
-                    let creationRequest = PHAssetCreationRequest.forAsset()
-                    creationRequest.addResource(with: .photo, data: photoData, options: nil)
+                    let creationReq = PHAssetCreationRequest.forAsset()
+                    creationReq.addResource(with: .photo, data: photoData, options: nil)
                     
                 }, completionHandler: { _, error in
                     if let error = error {
                         print(">>> [ERROR] Failed saving photo to system photo library: \(error)")
                     }
                     self.completionHandler(self)
-                }
-                )
+                })
             } else {
                 self.completionHandler(self)
             }
         }
     }
+    
 }

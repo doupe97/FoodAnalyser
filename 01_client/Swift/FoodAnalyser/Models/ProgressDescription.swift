@@ -1,8 +1,6 @@
 import UIKit
 
-struct Instruction {
-    var id: Int
+struct ProgressDescription {
     var title: String
     var description: String
-    var imageName: String
 }
