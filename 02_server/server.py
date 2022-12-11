@@ -6,6 +6,7 @@ import pyvista
 import trimesh
 import boto3
 import requests
+import time
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
 
@@ -204,6 +205,7 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
             fs = featureSensitivityOption
         
         # call object capture api as command executable
+        start = time.time()
         cp = subprocess.run(
             [f"{pathExecutable} {pathInputFolder} {pathOutputFolder} -d {dl} -o {sampleOrdering} -f {fs}"],
             check=True,
@@ -211,6 +213,8 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+        end = time.time()
+        measurementTimeInSeconds = round((end - start), 4)
 
         # check if generated OBJ 3D model file exists
         if os.path.exists(pathModelFile) == False:
@@ -299,6 +303,9 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
         #for file in os.listdir(pathInputFolder):
         #    os.remove(os.path.join(pathInputFolder, file))
 
+        #for file in os.listdir(pathOutputFolder):
+        #    os.remove(os.path.join(pathOutputFolder, file))
+
         #endregion
 
         return {
@@ -308,6 +315,7 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
             "density" : objectDensity,
             "detailLevel": dl,
             "featureSensitivity": fs,
+            "measurementTimeInSeconds": measurementTimeInSeconds,
             "pyvista": {
                 "usedLibrary" : "PyVista v0.36.1",
                 "volumeInCM3" : pyvistaVolumeCM3,
