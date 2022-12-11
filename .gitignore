@@ -7,6 +7,9 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+02_server/input/
+02_server/output/
+04_helper/food-images/
 .Python
 build/
 develop-eggs/
