@@ -7,12 +7,20 @@ struct FoodInfoResponse: Decodable {
     let density: Double
     let detailLevel: String
     let featureSensitivity: String
+    let measurementTimeInSeconds: Double
     let pyvista: LibraryInfo
     let trimesh: LibraryInfo
     let nutrients: Nutrients
     
+    func transformRawValue(_ value: Double?) -> String {
+        var result = "---"
+        if let val = value {
+            result = "\(val.round())"
+        }
+        return result
+    }
+    
     func getFoodInfoObject() -> FoodInfo {
-        
         var title: String = ""
         
         switch self.label {
@@ -38,37 +46,38 @@ struct FoodInfoResponse: Decodable {
                 FoodInfoItem(iconName: "Weight", type: "Gewicht (P)", value: "\(String(self.pyvista.weightInGrams.round())) g"),
                 FoodInfoItem(iconName: "Volume", type: "Volumen (T)", value: "\(String(self.trimesh.volumeInCM3.round())) cm3"),
                 FoodInfoItem(iconName: "Weight", type: "Gewicht (T)", value: "\(String(self.trimesh.weightInGrams.round())) g"),
-                FoodInfoItem(iconName: "Kcal", type: "Kcal", value: "\(self.nutrients.kcal?.round() ?? 0.0)"),
-                FoodInfoItem(iconName: "KJ", type: "kJ", value: "\(self.nutrients.kJ?.round() ?? 0.0)"),
+                FoodInfoItem(iconName: "Kcal", type: "Kcal", value: self.transformRawValue(self.nutrients.kcal)),
+                FoodInfoItem(iconName: "KJ", type: "kJ", value: self.transformRawValue(self.nutrients.kJ)),
                 FoodInfoItem(iconName: "Settings", type: "Detail Level", value: "\(String(self.detailLevel))"),
-                FoodInfoItem(iconName: "Settings", type: "Sensitivity", value: "\(String(self.featureSensitivity))")
+                FoodInfoItem(iconName: "Settings", type: "Sensitivity", value: "\(String(self.featureSensitivity))"),
+                FoodInfoItem(iconName: "Settings", type: "Messzeit", value: "\(String(self.measurementTimeInSeconds.round())) sec.")
             ],
             macronutrients: [
-                FoodInfoItem(iconName: "Protein", type: "Protein", value: "\(self.nutrients.protein?.round() ?? 0.0) g"),
-                FoodInfoItem(iconName: "Carbs", type: "Kohlenhydrate", value: "\(self.nutrients.carbohydrates?.round() ?? 0.0) g"),
-                FoodInfoItem(iconName: "Fat", type: "Fett", value: "\(self.nutrients.fat?.round() ?? 0.0) g"),
-                FoodInfoItem(iconName: "Sugar", type: "Zucker", value: "\(self.nutrients.sugars?.round() ?? 0.0) g"),
-                FoodInfoItem(iconName: "Water", type: "Wasser", value: "\(self.nutrients.water?.round() ?? 0.0) ml")
+                FoodInfoItem(iconName: "Protein", type: "Protein", value: "\(self.transformRawValue(self.nutrients.protein)) g"),
+                FoodInfoItem(iconName: "Carbs", type: "Kohlenhydrate", value: "\(self.transformRawValue(self.nutrients.carbohydrates)) g"),
+                FoodInfoItem(iconName: "Fat", type: "Fett", value: "\(self.transformRawValue(self.nutrients.fat)) g"),
+                FoodInfoItem(iconName: "Sugar", type: "Zucker", value: "\(self.transformRawValue(self.nutrients.sugars)) g"),
+                FoodInfoItem(iconName: "Water", type: "Wasser", value: "\(self.transformRawValue(self.nutrients.water)) g")
             ],
             micronutrients: [
-                FoodInfoItem(iconName: "Vitamin", type: "Vitamin A", value: "\(self.nutrients.vitaminA?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Vitamin", type: "Vitamin B-12", value: "\(self.nutrients.vitaminB12?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Vitamin", type: "Vitamin C", value: "\(self.nutrients.vitaminC?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Vitamin", type: "Vitamin D", value: "\(self.nutrients.vitaminD?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Vitamin", type: "Vitamin E", value: "\(self.nutrients.vitaminE?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Vitamin", type: "Vitamin K", value: "\(self.nutrients.vitaminK?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Alcohol", type: "Alkohol", value: "\(self.nutrients.alcohol?.round() ?? 0.0) g"),
-                FoodInfoItem(iconName: "Iron", type: "Eisen", value: "\(self.nutrients.iron?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Sugar", type: "Glucose", value: "\(self.nutrients.glucose?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Calcium", type: "Kalzium", value: "\(self.nutrients.calcium?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Coffein", type: "Koffein", value: "\(self.nutrients.caffeine?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Copper", type: "Kupfer", value: "\(self.nutrients.copper?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Magnesium", type: "Magnesium", value: "\(self.nutrients.magnesium?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Sugar", type: "Saccharose", value: "\(self.nutrients.sucrose?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Sugar", type: "Maltose", value: "\(self.nutrients.maltose?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Selenium", type: "Selen", value: "\(self.nutrients.selenium?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Sodium", type: "Natrium", value: "\(self.nutrients.sodium?.round() ?? 0.0) mg"),
-                FoodInfoItem(iconName: "Zinc", type: "Zink", value: "\(self.nutrients.zinc?.round() ?? 0.0) mg")
+                FoodInfoItem(iconName: "Vitamin", type: "Vitamin A", value: "\(self.transformRawValue(self.nutrients.vitaminA)) mg"),
+                FoodInfoItem(iconName: "Vitamin", type: "Vitamin B-12", value: "\(self.transformRawValue(self.nutrients.vitaminB12)) mg"),
+                FoodInfoItem(iconName: "Vitamin", type: "Vitamin C", value: "\(self.transformRawValue(self.nutrients.vitaminC)) mg"),
+                FoodInfoItem(iconName: "Vitamin", type: "Vitamin D", value: "\(self.transformRawValue(self.nutrients.vitaminD)) mg"),
+                FoodInfoItem(iconName: "Vitamin", type: "Vitamin E", value: "\(self.transformRawValue(self.nutrients.vitaminE)) mg"),
+                FoodInfoItem(iconName: "Vitamin", type: "Vitamin K", value: "\(self.transformRawValue(self.nutrients.vitaminK)) mg"),
+                FoodInfoItem(iconName: "Alcohol", type: "Alkohol", value: "\(self.transformRawValue(self.nutrients.alcohol)) g"),
+                FoodInfoItem(iconName: "Iron", type: "Eisen", value: "\(self.transformRawValue(self.nutrients.iron)) mg"),
+                FoodInfoItem(iconName: "Sugar", type: "Glucose", value: "\(self.transformRawValue(self.nutrients.glucose)) mg"),
+                FoodInfoItem(iconName: "Calcium", type: "Kalzium", value: "\(self.transformRawValue(self.nutrients.calcium)) mg"),
+                FoodInfoItem(iconName: "Caffeine", type: "Koffein", value: "\(self.transformRawValue(self.nutrients.caffeine)) mg"),
+                FoodInfoItem(iconName: "Copper", type: "Kupfer", value: "\(self.transformRawValue(self.nutrients.copper)) mg"),
+                FoodInfoItem(iconName: "Magnesium", type: "Magnesium", value: "\(self.transformRawValue(self.nutrients.magnesium)) mg"),
+                FoodInfoItem(iconName: "Sugar", type: "Saccharose", value: "\(self.transformRawValue(self.nutrients.sucrose)) mg"),
+                FoodInfoItem(iconName: "Sugar", type: "Maltose", value: "\(self.transformRawValue(self.nutrients.maltose)) mg"),
+                FoodInfoItem(iconName: "Selenium", type: "Selen", value: "\(self.transformRawValue(self.nutrients.selenium)) mg"),
+                FoodInfoItem(iconName: "Sodium", type: "Natrium", value: "\(self.transformRawValue(self.nutrients.sodium)) mg"),
+                FoodInfoItem(iconName: "Zinc", type: "Zink", value: "\(self.transformRawValue(self.nutrients.zinc)) mg")
             ].sorted(by: { $0.type < $1.type })
         )
     }
