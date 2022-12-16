@@ -1,0 +1,59 @@
+if lidarMode == .on {
+    guard let lidarDevice = AVCaptureDevice.default(.builtInLiDARDepthCamera, for: .video, position: .back) else {
+        print(">>> [ERROR] Lidar camera device is unavailable")
+        setupResult = .configurationFailed
+        captureSession.commitConfiguration()
+        return
+    }
+        
+    // source: https://developer.apple.com/documentation/avfoundation/additional_data_capture/capturing_photos_with_depth
+    // configure lidar device
+    
+    guard let format = (lidarDevice.formats.last { format in
+        format.formatDescription.dimensions.width == preferredWidthResolution &&
+        format.formatDescription.mediaSubType.rawValue == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange &&
+        !format.isVideoBinned &&
+        !format.supportedDepthDataFormats.isEmpty
+    }) else {
+        print(">>> [ERROR] ConfigureSession: ConfigurationError.requiredFormatUnavailable")
+        return
+    }
+    
+    guard let depthFormat = (format.supportedDepthDataFormats.last { depthFormat in
+        depthFormat.formatDescription.mediaSubType.rawValue == kCVPixelFormatType_DepthFloat16
+    }) else {
+        print(">>> [ERROR] ConfigureSession: ConfigurationError.requiredFormatUnavailable")
+        return
+    }
+    
+    try lidarDevice.lockForConfiguration()
+    lidarDevice.activeFormat = format
+    lidarDevice.activeDepthDataFormat = depthFormat
+    lidarDevice.unlockForConfiguration()
+    
+    print(">>> [INFO] Using lidar camera device")
+    defaultDevice = lidarDevice
+}
+
+
+
+@IBAction func toggleLidarMode(_ lidarModeButton: UIButton) {
+    // function toggles between lidar and dual camera setup
+    sessionQueue.async {
+        self.lidarMode = (self.lidarMode == .on) ? .off : .on
+        let lidarMode = self.lidarMode
+        
+        DispatchQueue.main.async {
+            if lidarMode == .on {
+                self.lidarModeButton.setImage(#imageLiteral(resourceName: "LidarON"), for: [])
+                self.infoLabel.text = "LiDAR"
+                
+            } else {
+                self.lidarModeButton.setImage(#imageLiteral(resourceName: "LidarOFF"), for: [])
+                self.infoLabel.text = "DualCam"
+            }
+        }
+        
+        self.configureSession()
+    }
+}
