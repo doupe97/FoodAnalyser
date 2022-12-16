@@ -6,11 +6,6 @@ import MediaPlayer
 
 class CameraViewController: UIViewController {
     
-    private enum LidarMode {
-        case on
-        case off
-    }
-    
     private enum SessionSetupResult {
         case success
         case notAuthorized
@@ -28,15 +23,12 @@ class CameraViewController: UIViewController {
     private let photoOutput = AVCapturePhotoOutput()
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
     private let preferredWidthResolution = 1920
-    private var lidarMode: LidarMode = .off
     private var keyValueObservations = [NSKeyValueObservation]()
     @objc dynamic var deviceInput: AVCaptureDeviceInput!
     
-    @IBOutlet private weak var photoButton: UIButton!
-    @IBOutlet weak var lidarModeButton: UIButton!
+    @IBOutlet weak var photoButton: UIButton!
     @IBOutlet weak var photoCounter: UILabel!
-    @IBOutlet private weak var previewView: PreviewView!
-    @IBOutlet weak var infoLabel: UILabel!
+    @IBOutlet weak var previewView: PreviewView!
     @IBOutlet weak var readyButton: UIButton!
     @IBOutlet weak var detailLevelButton: UIButton!
     @IBOutlet weak var featureSensitivityButton: UIButton!
@@ -49,11 +41,9 @@ class CameraViewController: UIViewController {
         self.setupMenuButtons()
         
         photoButton.isEnabled = false
-        lidarModeButton.isEnabled = false
         readyButton.isEnabled = false
         detailLevelButton.isEnabled = false
         featureSensitivityButton.isEnabled = false
-        infoLabel.text = "DualCam"
         
         // setup the preview view for photo capture and spinner
         previewView.session = captureSession
@@ -169,53 +159,15 @@ class CameraViewController: UIViewController {
         do {
             var defaultDevice: AVCaptureDevice?
             
-            if lidarMode == .on {
-                guard let lidarDevice = AVCaptureDevice.default(.builtInLiDARDepthCamera, for: .video, position: .back) else {
-                    print(">>> [ERROR] Lidar camera device is unavailable")
-                    setupResult = .configurationFailed
-                    captureSession.commitConfiguration()
-                    return
-                }
-                    
-                // source: https://developer.apple.com/documentation/avfoundation/additional_data_capture/capturing_photos_with_depth
-                // configure lidar device
-                
-                guard let format = (lidarDevice.formats.last { format in
-                    format.formatDescription.dimensions.width == preferredWidthResolution &&
-                    format.formatDescription.mediaSubType.rawValue == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange &&
-                    !format.isVideoBinned &&
-                    !format.supportedDepthDataFormats.isEmpty
-                }) else {
-                    print(">>> [ERROR] ConfigureSession: ConfigurationError.requiredFormatUnavailable")
-                    return
-                }
-                
-                guard let depthFormat = (format.supportedDepthDataFormats.last { depthFormat in
-                    depthFormat.formatDescription.mediaSubType.rawValue == kCVPixelFormatType_DepthFloat16
-                }) else {
-                    print(">>> [ERROR] ConfigureSession: ConfigurationError.requiredFormatUnavailable")
-                    return
-                }
-                
-                try lidarDevice.lockForConfiguration()
-                lidarDevice.activeFormat = format
-                lidarDevice.activeDepthDataFormat = depthFormat
-                lidarDevice.unlockForConfiguration()
-                
-                print(">>> [INFO] Using lidar camera device")
-                defaultDevice = lidarDevice
-                
-            } else {
-                // configure dual camera setup
-                guard let dualCameraDevice = AVCaptureDevice.default(.builtInDualCamera, for: .video, position: .back) else {
-                    print(">>> [ERROR] Dual camera device is unavailable")
-                    setupResult = .configurationFailed
-                    captureSession.commitConfiguration()
-                    return
-                }
-                print(">>> [INFO] Using dual camera device")
-                defaultDevice = dualCameraDevice
+            // configure dual camera setup
+            guard let dualCameraDevice = AVCaptureDevice.default(.builtInDualCamera, for: .video, position: .back) else {
+                print(">>> [ERROR] Dual camera device is unavailable")
+                setupResult = .configurationFailed
+                captureSession.commitConfiguration()
+                return
             }
+            print(">>> [INFO] Using dual camera device")
+            defaultDevice = dualCameraDevice
             
             // commit session configuration
             guard let device = defaultDevice else {
@@ -359,27 +311,6 @@ class CameraViewController: UIViewController {
     
     
     // MARK: Button Functions
-
-    @IBAction func toggleLidarMode(_ lidarModeButton: UIButton) {
-        // function toggles between lidar and dual camera setup
-        sessionQueue.async {
-            self.lidarMode = (self.lidarMode == .on) ? .off : .on
-            let lidarMode = self.lidarMode
-            
-            DispatchQueue.main.async {
-                if lidarMode == .on {
-                    self.lidarModeButton.setImage(#imageLiteral(resourceName: "LidarON"), for: [])
-                    self.infoLabel.text = "LiDAR"
-                    
-                } else {
-                    self.lidarModeButton.setImage(#imageLiteral(resourceName: "LidarOFF"), for: [])
-                    self.infoLabel.text = "DualCam"
-                }
-            }
-            
-            self.configureSession()
-        }
-    }
     
     @IBAction func showInfoView(_ sender: UIButton) {
         // shows instruction view controller
@@ -526,7 +457,6 @@ class CameraViewController: UIViewController {
             guard let isSessionRunning = change.newValue else { return }
             DispatchQueue.main.async {
                 self.photoButton.isEnabled = isSessionRunning
-                self.lidarModeButton.isEnabled = isSessionRunning
                 self.readyButton.isEnabled = isSessionRunning
                 self.detailLevelButton.isEnabled = isSessionRunning
                 self.featureSensitivityButton.isEnabled = isSessionRunning
