@@ -263,6 +263,7 @@ class CameraViewController: UIViewController {
             // required photo setting: embed the depth map into the .heic output file
             photoSettings.isDepthDataDeliveryEnabled = true
             photoSettings.isDepthDataFiltered = false // default is true
+            photoSettings.embedsDepthDataInPhoto = true // includes depth map in .heic output file
             
             // optional photo settings for better quality
             photoSettings.flashMode = .off
