@@ -9,7 +9,7 @@ __pycache__/
 # Distribution / packaging
 02_server/input/
 02_server/output/
-04_helper/food-images/
+04_helper/
 .Python
 build/
 develop-eggs/
