@@ -1,12 +1,7 @@
-import os
 import csv
-import subprocess
-import requests
-import json
 import statistics
 import random
 import numpy as np
-from statsmodels import robust
 
 sourceCsv = "/Users/nico/Desktop/FoodAnalyser/02_server/source.csv"
 targetCsv = "/Users/nico/Desktop/FoodAnalyser/02_server/target.csv"

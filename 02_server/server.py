@@ -1,5 +1,4 @@
 import os
-import csv
 import shutil
 import subprocess
 import pyvista
@@ -106,7 +105,7 @@ async def UploadImage(file: UploadFile = File(...)):
 @app.get("/analyse-object")
 async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
     try:
-        #region 1. Identify object by image classification API
+        #region 1. Identify object (image classification with AWS Rekognition API)
         
         dirList = os.listdir(pathInputFolder)
         if len(dirList) == 0:
@@ -146,7 +145,7 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
         with open(pathInputImageJpg, "rb") as src_image:
             src_bytes = src_image.read()
 
-        # call aws rekognition api
+        # call aws rekognition api with parameters
         response = client.detect_labels(
             Image={'Bytes': src_bytes},
             MaxLabels=10,
@@ -171,28 +170,7 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
 
         #endregion
 
-        #region 2. Get density information about the object
-
-        # get density information from .csv file and create dictionary
-        densityDict = {}
-        with open(densityCsvFilePath) as csvFile:
-            reader = csv.reader(csvFile)
-            for row in reader:
-                arr = row[0].split(";")
-                densityDict[arr[0]] = arr[1]
-
-        # extract density information for given object from dictionary
-        objectDensity = float(densityDict[objectLabel])
-
-        if not objectDensity:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not get object density information."
-            }
-
-        #endregion
-
-        #region 3. Generate the 3D model by Object Capture API
+        #region 2. Generate the 3D model (Object Capture API)
         
         # set detail level parameter for object capture api
         dl = detailLevel # default = medium
@@ -225,6 +203,37 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
 
         #endregion
 
+        #region 3. Fetch food information from FoodData Central API
+
+        # call the FoodData Central api
+        foodDataCentralApiParams["query"] = objectLabel.lower().strip()
+        response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
+        
+        data = response.json()
+        if not data:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not fetch food nutrient information from FoodData Central API."
+            }
+
+        # extract density information from api response
+        objectDensity = data["foods"][0]["foodGenerals"]["density"]
+        if not objectDensity:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not extract food density information from API response."
+            }
+
+        # extract raw food nutrients from api response
+        nutrientsRaw = data["foods"][0]["foodNutrients"]
+        if not nutrientsRaw:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not extract raw food nutrient information from API response."
+            }
+        
+        #endregion
+
         #region 4. Calculate object volume and weight
 
         # calculate object volume of generated 3d model by PyVista library
@@ -242,20 +251,9 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
 
         #endregion
 
-        #region 5. Fetch food nutrient information by FoodData Central API
+        #region 5. Extract relevant food nutrient information from raw API response
 
-        # call the FoodData Central api
-        foodDataCentralApiParams["query"] = objectLabel.lower().strip()
-        response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
-        data = response.json()
-
-        if not data:
-            print("No data found")
-
-        # extract raw food nutrients from api response
-        nutrientsRaw = data["foods"][0]["foodNutrients"]
         nutrients = {}
-
         for nutrient in nutrientsRaw:
             nutrientName = nutrient["nutrientName"].lower()
             if any(substring in nutrientName for substring in relevantNutrients):
@@ -292,19 +290,20 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
         if not nutrients or len(nutrients) == 0:
             return {
                 "statusCode" : 500,
-                "errorMessage" : "Could not fetch nutrient information from FoodData Central API."
+                "errorMessage" : "Could not extract food nutrient information."
             }
         
         #endregion
 
-        #region 6. Delete uploaded images
+        #region 6. Delete uploaded input images and generated 3D model
 
         # delete all files in the server api input folder
-        #for file in os.listdir(pathInputFolder):
-        #    os.remove(os.path.join(pathInputFolder, file))
+        for file in os.listdir(pathInputFolder):
+            os.remove(os.path.join(pathInputFolder, file))
 
-        #for file in os.listdir(pathOutputFolder):
-        #    os.remove(os.path.join(pathOutputFolder, file))
+        # delete all files in the server api output folder
+        for file in os.listdir(pathOutputFolder):
+            os.remove(os.path.join(pathOutputFolder, file))
 
         #endregion
 

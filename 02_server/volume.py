@@ -1,5 +1,4 @@
 import pyvista as pv
-import subprocess
 
 folderName = "test-17-dualCam-filtered-depth-data-heic"
 filePath = "/Users/nico/Desktop/output/" + folderName + "/baked_mesh.obj"
