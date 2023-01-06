@@ -105,7 +105,7 @@ async def UploadImage(file: UploadFile = File(...)):
 @app.get("/analyse-object")
 async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
     try:
-        #region 1. Identify object (image classification with AWS Rekognition API)
+        #region 1. Identify object with image classification by AWS Rekognition API
         
         dirList = os.listdir(pathInputFolder)
         if len(dirList) == 0:
@@ -170,7 +170,31 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
 
         #endregion
 
-        #region 2. Generate the 3D model (Object Capture API)
+        #region 2. Fetch food density information from FoodData Central API
+
+        # call the FoodData Central api
+        foodDataCentralApiParams["query"] = objectLabel.lower().strip()
+        foodDataCentralApiParams["dataset"] = "generalsV2"
+        response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
+        
+        data = response.json()
+        if not data:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not fetch food density information from FoodData Central API."
+            }
+
+        # extract density information from api response
+        objectDensity = data["foods"][0]["foodGenerals"]["density"]
+        if not objectDensity:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not extract food density information from API response."
+            }
+
+        #endregion
+
+        #region 3. Generate the 3D model by Object Capture API
         
         # set detail level parameter for object capture api
         dl = detailLevel # default = medium
@@ -203,37 +227,6 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
 
         #endregion
 
-        #region 3. Fetch food information from FoodData Central API
-
-        # call the FoodData Central api
-        foodDataCentralApiParams["query"] = objectLabel.lower().strip()
-        response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
-        
-        data = response.json()
-        if not data:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not fetch food nutrient information from FoodData Central API."
-            }
-
-        # extract density information from api response
-        objectDensity = data["foods"][0]["foodGenerals"]["density"]
-        if not objectDensity:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not extract food density information from API response."
-            }
-
-        # extract raw food nutrients from api response
-        nutrientsRaw = data["foods"][0]["foodNutrients"]
-        if not nutrientsRaw:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not extract raw food nutrient information from API response."
-            }
-        
-        #endregion
-
         #region 4. Calculate object volume and weight
 
         # calculate object volume of generated 3d model by PyVista library
@@ -251,8 +244,28 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
 
         #endregion
 
-        #region 5. Extract relevant food nutrient information from raw API response
+        #region 5. Fetch food nutrient information from FoodData Central API
 
+        # call the FoodData Central api
+        foodDataCentralApiParams["query"] = objectLabel.lower().strip()
+        foodDataCentralApiParams["dataset"] = "nutrientsV2"
+        response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
+        
+        data = response.json()
+        if not data:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not fetch food nutrient information from FoodData Central API."
+            }
+
+        # extract raw food nutrients from api response
+        nutrientsRaw = data["foods"][0]["foodNutrients"]
+        if not nutrientsRaw:
+            return {
+                "statusCode" : 500,
+                "errorMessage" : "Could not extract raw food nutrient information from API response."
+            }
+        
         nutrients = {}
         for nutrient in nutrientsRaw:
             nutrientName = nutrient["nutrientName"].lower()
