@@ -20,9 +20,6 @@ pathModelFile = f"{pathOutputFolder}/baked_mesh.obj"
 # object capture api detail level (preview, reduced, medium, full, raw)
 detailLevel = "medium" # default
 
-# object capture api sample ordering (unordered, sequential)
-sampleOrdering = "sequential" # default
-
 # object capture api feature sensitivity (normal, high)
 featureSensitivity = "normal" # default
 
@@ -68,7 +65,7 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
         # call object capture api as command executable
         start = time.time()
         cp = subprocess.run(
-            [f"{pathExecutable} {pathInputFolder} {pathOutputFolder} -d {dl} -o {sampleOrdering} -f {fs}"],
+            [f"{pathExecutable} {pathInputFolder} {pathOutputFolder} -o sequential -d {dl} -f {fs}"],
             check=True,
             shell=True,
             stdout=subprocess.PIPE,
