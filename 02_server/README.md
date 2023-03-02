@@ -16,16 +16,13 @@
 - pip3 install python-multipart
 - pip3 install -Iv pyvista==0.36.1
 - pip3 install pymeshfix
-- pip3 install trimesh
-- pip3 install boto3
-- pip3 install requests
 
 ### Start API Server:
 uvicorn server:app --reload --host 192.168.178.81 --port 8000
 
 ### Object Capture API
 - Creates .obj + texture files:
-- ./Desktop/AppleObjectCaptureApi Desktop/input Desktop/output -d medium -o sequential -f normal
+- ./Desktop/AppleObjectCaptureApi Desktop/input Desktop/output -o sequential -d medium -f normal
 
 - Convert .obj to .usdz:
 - export PATH=$PATH:/Applications/usdpython/USD:$PATH:/Applications/usdpython/usdzconvert;
