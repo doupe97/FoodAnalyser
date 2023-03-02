@@ -94,8 +94,8 @@ class ProcessingViewController: UIViewController {
             if let responseData = data {
                 self.stopTimer()
                 
-                if let foodInfoResponse = try? JSONDecoder().decode(FoodInfoResponse.self, from: responseData) {
-                    print(">>> [INFO] API status code: \(foodInfoResponse.statusCode)")
+                if let responseInfo = try? JSONDecoder().decode(ResponseInfo.self, from: responseData) {
+                    print(">>> [INFO] API status code: \(responseInfo.statusCode)")
                     print(">>> [INFO] FoodInfo object is available")
                     
                     // show result view with collected food information
@@ -103,7 +103,7 @@ class ProcessingViewController: UIViewController {
                         let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
                             withIdentifier: Constants.SID_VC_Result) as! ResultViewController
                         vc.modalPresentationStyle = .fullScreen
-                        vc.foodInfo = foodInfoResponse.getFoodInfoObject()
+                        vc.responseInfo = responseInfo
                         self.present(vc, animated: false, completion: nil)
                     }
                     
@@ -141,35 +141,27 @@ class ProcessingViewController: UIViewController {
         }
     }
     
+    // function defines the progress description texts in the ui
     fileprivate func setupProgressDescriptions() {
-        // function defines the progress description texts in the ui
         descriptions.append(ProgressDescription(
-            title: "Lade Daten ...",
-            description: "Die aufgenommenen Bilder werden nun von der Server API entgegengenommen, als Eingabe geladen und zur Analyse des vorliegenden Lebensmittels verarbeitet."))
-        
-        descriptions.append(ProgressDescription(
-            title: "Erkenne Lebensmittel ...",
-            description: "Das erste aufgenommene Bild wird nun an die AWS Rekognition API geschickt, welche eine Bildklassifizierung durchführt und das vorliegende Lebensmittel identifiziert."))
-        
-        descriptions.append(ProgressDescription(
-            title: "Hole Dichte ...",
-            description: "Anschließend wird die durchschnittliche Dichte des Lebensmittels mithilfe einer weiteren API ermittelt, um im Folgenden das Gewicht bestimmen zu können."))
+            title: "Lade Bilder ...",
+            description: "Die aufgenommenen Bilder werden nun von der Server API entgegengenommen, als Eingabe geladen und zur Analyse des vorliegenden Lebensmittels vorbereitet."))
         
         descriptions.append(ProgressDescription(
             title: "Generiere 3D-Modell ...",
             description: "Die Object Capture API des RealityKit Frameworks berechnet nun aus der erhaltenen Bilderserie unter Anwendung verschiedener photogrammetrischer Verfahren ein 3D-Modell des Lebensmittels."))
         
         descriptions.append(ProgressDescription(
+            title: "Erfasse Messzeit ...",
+            description: "Parallel zur Objektrekonstruktion wird die Messzeit bzw. die Dauer der Rekonstruktion gemessen und dokumentiert."))
+        
+        descriptions.append(ProgressDescription(
             title: "Berechne Volumen ...",
             description: "Auf Basis des generierten 3D-Modells kann nun das Volumen des Lebensmittels berechnet werden."))
         
         descriptions.append(ProgressDescription(
-            title: "Berechne Gewicht ...",
-            description: "Durch Multiplikation von Dichte und Volumen kann das Gewicht des vorliegenden Lebensmittels errechnet werden."))
-        
-        descriptions.append(ProgressDescription(
-            title: "Analysiere Nährstoffe ...",
-            description: "Die Lebensmittelbezeichnung wird im letzten Schritt zusammen mit dem Gewicht an die FoodData Central API geschickt, welche die enthaltenen Nährstoffe zurückliefert."))
+            title: "Bereite Rückgabe vor ...",
+            description: "Das Messergebnis wird für die Rückgabe an den Client zusammengestellt."))
     }
     
     fileprivate func runTimer() {

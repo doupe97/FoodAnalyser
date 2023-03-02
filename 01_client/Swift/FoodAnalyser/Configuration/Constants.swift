@@ -10,6 +10,7 @@ struct Constants {
     static let SID_VC_Camera = "SID_VC_Camera"
     static let SID_VC_Processing = "SID_VC_Processing"
     static let SID_VC_Result = "SID_VC_Result"
+    static let SID_VC_Measurement = "SID_VC_Measurement"
     
     // server api urls
     static let SRV_API_Alive = "http://192.168.178.81:8000/alive"

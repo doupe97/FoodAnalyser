@@ -12,17 +12,16 @@
 		0320406729391B2900F7518A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0320406629391B2900F7518A /* Constants.swift */; };
 		037BA1A3293D194E0050DDE9 /* ProcessingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037BA1A2293D194E0050DDE9 /* ProcessingViewController.swift */; };
 		03B0C0F8292A8B1C00F4CEE9 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B0C0F7292A8B1C00F4CEE9 /* Extensions.swift */; };
-		03D6636D2944C6F000045653 /* FoodInfoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D6636C2944C6F000045653 /* FoodInfoItem.swift */; };
-		03E06CD92943A70F00917E2D /* FoodInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E06CD82943A70F00917E2D /* FoodInfo.swift */; };
-		03E06CDC2943ACEC00917E2D /* TVCLFoodInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E06CDA2943ACEC00917E2D /* TVCLFoodInfo.swift */; };
-		03E06CDD2943ACEC00917E2D /* TVCLFoodInfo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 03E06CDB2943ACEC00917E2D /* TVCLFoodInfo.xib */; };
+		03E06CDC2943ACEC00917E2D /* TVCLMeasurementInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E06CDA2943ACEC00917E2D /* TVCLMeasurementInfo.swift */; };
+		03E06CDD2943ACEC00917E2D /* TVCLMeasurementInfo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 03E06CDB2943ACEC00917E2D /* TVCLMeasurementInfo.xib */; };
 		03E06CDF2943B59700917E2D /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E06CDE2943B59700917E2D /* Media.swift */; };
+		03E071B029B0F46A0054D1BD /* MeasurementsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E071AF29B0F46A0054D1BD /* MeasurementsViewController.swift */; };
+		03E071D629B0FA050054D1BD /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 03E071D429B0FA050054D1BD /* CoreData.xcdatamodeld */; };
+		03E071D829B100D70054D1BD /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E071D729B100D70054D1BD /* CoreDataManager.swift */; };
 		03E94FBB293E5EB500B769EF /* loading.gif in Resources */ = {isa = PBXBuildFile; fileRef = 03E94FBA293E5EB500B769EF /* loading.gif */; };
 		03E94FBF293E6C7A00B769EF /* ProgressDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E94FBE293E6C7A00B769EF /* ProgressDescription.swift */; };
 		03E94FC1293F605D00B769EF /* ResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E94FC0293F605D00B769EF /* ResultViewController.swift */; };
-		03E94FC3293F608300B769EF /* FoodInfoResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E94FC2293F608300B769EF /* FoodInfoResponse.swift */; };
-		03E94FC5293F616F00B769EF /* Nutrients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E94FC4293F616F00B769EF /* Nutrients.swift */; };
-		03E94FC92941C92E00B769EF /* LibraryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E94FC82941C92E00B769EF /* LibraryInfo.swift */; };
+		03E94FC3293F608300B769EF /* ResponseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E94FC2293F608300B769EF /* ResponseInfo.swift */; };
 		7AA677151CFF765600B353FB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA677141CFF765600B353FB /* AppDelegate.swift */; };
 		7AA677171CFF765600B353FB /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA677161CFF765600B353FB /* CameraViewController.swift */; };
 		7AA6771A1CFF765600B353FB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AA677181CFF765600B353FB /* Main.storyboard */; };
@@ -38,17 +37,16 @@
 		0320406629391B2900F7518A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		037BA1A2293D194E0050DDE9 /* ProcessingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingViewController.swift; sourceTree = "<group>"; };
 		03B0C0F7292A8B1C00F4CEE9 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		03D6636C2944C6F000045653 /* FoodInfoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodInfoItem.swift; sourceTree = "<group>"; };
-		03E06CD82943A70F00917E2D /* FoodInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodInfo.swift; sourceTree = "<group>"; };
-		03E06CDA2943ACEC00917E2D /* TVCLFoodInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVCLFoodInfo.swift; sourceTree = "<group>"; };
-		03E06CDB2943ACEC00917E2D /* TVCLFoodInfo.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TVCLFoodInfo.xib; sourceTree = "<group>"; };
+		03E06CDA2943ACEC00917E2D /* TVCLMeasurementInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVCLMeasurementInfo.swift; sourceTree = "<group>"; };
+		03E06CDB2943ACEC00917E2D /* TVCLMeasurementInfo.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TVCLMeasurementInfo.xib; sourceTree = "<group>"; };
 		03E06CDE2943B59700917E2D /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
+		03E071AF29B0F46A0054D1BD /* MeasurementsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementsViewController.swift; sourceTree = "<group>"; };
+		03E071D529B0FA050054D1BD /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
+		03E071D729B100D70054D1BD /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		03E94FBA293E5EB500B769EF /* loading.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = loading.gif; path = ../../../../04_helper/gifs/loading.gif; sourceTree = "<group>"; };
 		03E94FBE293E6C7A00B769EF /* ProgressDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressDescription.swift; sourceTree = "<group>"; };
 		03E94FC0293F605D00B769EF /* ResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewController.swift; sourceTree = "<group>"; };
-		03E94FC2293F608300B769EF /* FoodInfoResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodInfoResponse.swift; sourceTree = "<group>"; };
-		03E94FC4293F616F00B769EF /* Nutrients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nutrients.swift; sourceTree = "<group>"; };
-		03E94FC82941C92E00B769EF /* LibraryInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryInfo.swift; sourceTree = "<group>"; };
+		03E94FC2293F608300B769EF /* ResponseInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseInfo.swift; sourceTree = "<group>"; };
 		7AA677111CFF765600B353FB /* FoodAnalyser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoodAnalyser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AA677141CFF765600B353FB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AA677161CFF765600B353FB /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
@@ -78,13 +76,9 @@
 			children = (
 				032040632939137C00F7518A /* Instruction.swift */,
 				03E94FBE293E6C7A00B769EF /* ProgressDescription.swift */,
-				7AA677281CFF7B5C00B353FB /* PreviewView.swift */,
-				03E94FC2293F608300B769EF /* FoodInfoResponse.swift */,
-				03E06CD82943A70F00917E2D /* FoodInfo.swift */,
-				03D6636C2944C6F000045653 /* FoodInfoItem.swift */,
-				03E94FC4293F616F00B769EF /* Nutrients.swift */,
-				03E94FC82941C92E00B769EF /* LibraryInfo.swift */,
+				03E94FC2293F608300B769EF /* ResponseInfo.swift */,
 				03E06CDE2943B59700917E2D /* Media.swift */,
+				7AA677281CFF7B5C00B353FB /* PreviewView.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -105,6 +99,7 @@
 				032040602939120E00F7518A /* InstructionViewController.swift */,
 				037BA1A2293D194E0050DDE9 /* ProcessingViewController.swift */,
 				03E94FC0293F605D00B769EF /* ResultViewController.swift */,
+				03E071AF29B0F46A0054D1BD /* MeasurementsViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -114,8 +109,9 @@
 			children = (
 				03B0C0F7292A8B1C00F4CEE9 /* Extensions.swift */,
 				7AA677261CFF774800B353FB /* PhotoCaptureDelegate.swift */,
-				03E06CDA2943ACEC00917E2D /* TVCLFoodInfo.swift */,
-				03E06CDB2943ACEC00917E2D /* TVCLFoodInfo.xib */,
+				03E071D729B100D70054D1BD /* CoreDataManager.swift */,
+				03E06CDA2943ACEC00917E2D /* TVCLMeasurementInfo.swift */,
+				03E06CDB2943ACEC00917E2D /* TVCLMeasurementInfo.xib */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -167,6 +163,7 @@
 				7AA6771D1CFF765600B353FB /* LaunchScreen.storyboard */,
 				7AA6771B1CFF765600B353FB /* Assets.xcassets */,
 				7AA677201CFF765600B353FB /* Info.plist */,
+				03E071D429B0FA050054D1BD /* CoreData.xcdatamodeld */,
 			);
 			path = FoodAnalyser;
 			sourceTree = "<group>";
@@ -242,7 +239,7 @@
 			files = (
 				7AA6771F1CFF765600B353FB /* LaunchScreen.storyboard in Resources */,
 				7AA6771C1CFF765600B353FB /* Assets.xcassets in Resources */,
-				03E06CDD2943ACEC00917E2D /* TVCLFoodInfo.xib in Resources */,
+				03E06CDD2943ACEC00917E2D /* TVCLMeasurementInfo.xib in Resources */,
 				03E94FBB293E5EB500B769EF /* loading.gif in Resources */,
 				7AA6771A1CFF765600B353FB /* Main.storyboard in Resources */,
 			);
@@ -255,23 +252,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				03E071D629B0FA050054D1BD /* CoreData.xcdatamodeld in Sources */,
 				037BA1A3293D194E0050DDE9 /* ProcessingViewController.swift in Sources */,
 				03B0C0F8292A8B1C00F4CEE9 /* Extensions.swift in Sources */,
 				7AA677271CFF774800B353FB /* PhotoCaptureDelegate.swift in Sources */,
+				03E071D829B100D70054D1BD /* CoreDataManager.swift in Sources */,
 				7AA677291CFF7B5C00B353FB /* PreviewView.swift in Sources */,
 				032040642939137C00F7518A /* Instruction.swift in Sources */,
 				03E94FBF293E6C7A00B769EF /* ProgressDescription.swift in Sources */,
-				03D6636D2944C6F000045653 /* FoodInfoItem.swift in Sources */,
-				03E94FC92941C92E00B769EF /* LibraryInfo.swift in Sources */,
 				032040612939120E00F7518A /* InstructionViewController.swift in Sources */,
 				7AA677171CFF765600B353FB /* CameraViewController.swift in Sources */,
 				7AA677151CFF765600B353FB /* AppDelegate.swift in Sources */,
 				0320406729391B2900F7518A /* Constants.swift in Sources */,
+				03E071B029B0F46A0054D1BD /* MeasurementsViewController.swift in Sources */,
 				03E06CDF2943B59700917E2D /* Media.swift in Sources */,
-				03E94FC5293F616F00B769EF /* Nutrients.swift in Sources */,
-				03E94FC3293F608300B769EF /* FoodInfoResponse.swift in Sources */,
-				03E06CDC2943ACEC00917E2D /* TVCLFoodInfo.swift in Sources */,
-				03E06CD92943A70F00917E2D /* FoodInfo.swift in Sources */,
+				03E94FC3293F608300B769EF /* ResponseInfo.swift in Sources */,
+				03E06CDC2943ACEC00917E2D /* TVCLMeasurementInfo.swift in Sources */,
 				03E94FC1293F605D00B769EF /* ResultViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -479,6 +475,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		03E071D429B0FA050054D1BD /* CoreData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				03E071D529B0FA050054D1BD /* CoreData.xcdatamodel */,
+			);
+			currentVersion = 03E071D529B0FA050054D1BD /* CoreData.xcdatamodel */;
+			path = CoreData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 7AA677091CFF765500B353FB /* Project object */;
 }

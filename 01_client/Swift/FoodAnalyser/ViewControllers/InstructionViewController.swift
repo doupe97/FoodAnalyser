@@ -7,7 +7,6 @@ class InstructionViewController: UIViewController {
     @IBOutlet weak var intructionTextView: UITextView!
     @IBOutlet weak var nextInstructionButton: UIButton!
     @IBOutlet weak var prevInstructionButton: UIButton!
-    @IBOutlet weak var startButton: UIButton!
     
     private var instructions = [Instruction]()
     private var currentInstructionNumber: Int = 1
@@ -29,25 +28,25 @@ class InstructionViewController: UIViewController {
         self.instructions.append(Instruction(
             id: 2,
             title: "Fotografie",
-            description: "Um das vorligende Lebensmittel hinsichtlich seines Volumens und der enthaltenen Nährstoffe analysieren zu können, muss dieses im ersten Schritt in unterschiedlichen Winkeln fotografiert werden.",
+            description: "Um das Volumen des vorliegenden Lebensmittels analysieren zu können, muss dieses im ersten Schritt in unterschiedlichen Winkeln fotografiert werden.",
             imageName: "InstructionImage2"))
         
         self.instructions.append(Instruction(
             id: 3,
             title: "Hochladen",
-            description: "Parallel zur Aufnahme der Bilder werden die gespeicherten Aufnahmen zur Analyse an die externe Server API geschickt.",
+            description: "Nach jedem aufgenommenen Bild wird dieses zur Objektrekonstruktion und Volumenbestimmung an die externe Server API geschickt.",
             imageName: "InstructionImage3"))
         
         self.instructions.append(Instruction(
             id: 4,
             title: "Verarbeitung",
-            description: "Der Server generiert aus den erhaltenen Bildern ein 3D-Modell und berechnet anschließend neben dem Volumen und Gewicht die enthaltenen Nährstoffe des Lebensmittels.",
+            description: "Der Server generiert aus den erhaltenen Bildern ein 3D-Modell und berechnet anschließend das Volumen.",
             imageName: "InstructionImage4"))
         
         self.instructions.append(Instruction(
             id: 5,
             title: "Ergebnis",
-            description: "Abschließend werden die Ergebnisse der Analyse von der Server API abgerufen und in der App aufbereitet dargestellt.",
+            description: "Abschließend werden die Ergebnisse der Analyse von der Server API abgerufen und in der App präsentiert.",
             imageName: "InstructionImage5"))
     }
     
@@ -139,5 +138,12 @@ class InstructionViewController: UIViewController {
                 return
             }
         }.resume()
+    }
+    
+    @IBAction func pressedMeasurementsButton(_ sender: UIButton) {
+        let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
+            withIdentifier: Constants.SID_VC_Measurement) as! MeasurementsViewController
+        vc.modalPresentationStyle = .fullScreen
+        self.present(vc, animated: false, completion: nil)
     }
 }

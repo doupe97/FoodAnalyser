@@ -102,27 +102,15 @@ class CameraViewController: UIViewController {
                 
             case .notAuthorized:
                 DispatchQueue.main.async {
-                    let changePrivacySetting = "FoodAnalyser does not have permission to use the camera."
-                    let message = NSLocalizedString(changePrivacySetting, comment: "Alert message when the user has denied access to the camera")
-                    let alertController = UIAlertController(title: "FoodAnalyser", message: message, preferredStyle: .alert)
-                    
-                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "OK"), style: .cancel, handler: nil))
-                    alertController.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: "Open Settings"), style: .`default`,
-                        handler: { _ in
-                            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
-                                                      options: [:],
-                                                      completionHandler: nil)
-                    }))
-                    
+                    let alertController = UIAlertController(title: "FoodAnalyser", message: "FoodAnalyser does not have permission to use the camera.", preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
                 }
                 
             default:
                 DispatchQueue.main.async {
-                    let alertMsg = "Something went wrong"
-                    let message = NSLocalizedString("Something went wrong", comment: alertMsg)
-                    let alertController = UIAlertController(title: "FoodAnalyser", message: message, preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
+                    let alertController = UIAlertController(title: "FoodAnalyser", message: "Es ist ein Fehler aufgetreten", preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                     self.present(alertController, animated: true, completion: nil)
                 }
             }
@@ -312,14 +300,6 @@ class CameraViewController: UIViewController {
     
     
     // MARK: Button Functions
-    
-    @IBAction func showInfoView(_ sender: UIButton) {
-        // shows instruction view controller
-        let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
-            withIdentifier: Constants.SID_VC_Instruction) as! InstructionViewController
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: false, completion: nil)
-    }
     
     fileprivate func setupMenuButtons() {
         let tapAction = { (action: UIAction) in }

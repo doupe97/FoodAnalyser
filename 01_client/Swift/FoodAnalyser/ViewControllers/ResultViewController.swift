@@ -1,71 +1,58 @@
 import UIKit
 import SceneKit.ModelIO
 
-class ResultViewController: UIViewController, URLSessionDownloadDelegate, UITableViewDelegate, UITableViewDataSource {
+class ResultViewController: UIViewController, URLSessionDownloadDelegate {
     
     @IBOutlet weak var sceneView: SCNView!
-    @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var segControl: UISegmentedControl!
+    @IBOutlet weak var labelDetailLevel: UILabel!
+    @IBOutlet weak var labelFeatureSensitivity: UILabel!
+    @IBOutlet weak var labelVolume: UILabel!
+    @IBOutlet weak var labelMeasurementTime: UILabel!
     
-    public var foodInfo: FoodInfo? = nil
+    public var responseInfo: ResponseInfo? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // register table view delegate and datasource
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        
-        // register custom table view cell (TVCLFoodInfo)
-        self.tableView.register(TVCLFoodInfo.nib(), forCellReuseIdentifier: TVCLFoodInfo.identifier)
-        
         // call function for downloading the generated 3d model file from the server
         self.downloadModelFile()
-    }
-    
-    
-    // MARK: Table View Controller Delegate and Datasource Methods
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // function defines the number of items in the table view based on selected segment control value
-        switch self.segControl.selectedSegmentIndex {
-        case 0:
-            return (self.foodInfo != nil) ? self.foodInfo!.general.count : 0
-        case 1:
-            return (self.foodInfo != nil) ? self.foodInfo!.macronutrients.count : 0
-        case 2:
-            return (self.foodInfo != nil) ? self.foodInfo!.micronutrients.count : 0
-        default:
-            return (self.foodInfo != nil) ? self.foodInfo!.general.count : 0
+        
+        // draw response info on screen
+        if let responseInfo = self.responseInfo {
+            labelDetailLevel.text = "\(responseInfo.detailLevel)"
+            labelFeatureSensitivity.text = "\(responseInfo.featureSensitivity)"
+            labelVolume.text = "\(responseInfo.volumeInCM3) cm3"
+            labelMeasurementTime.text = "\(responseInfo.measurementTimeInSeconds) sec."
         }
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let customCell = tableView.dequeueReusableCell(withIdentifier: TVCLFoodInfo.identifier, for: indexPath) as? TVCLFoodInfo else {
-            return UITableViewCell()
+    // function gets called when user taps on Speichern button
+    @IBAction func btnSaveResult(_ sender: UIButton) {
+        let dialog = UIAlertController(title: "Speicherung", message: "Bitte geben Sie eine Bezeichnung für diese Messung an.", preferredStyle: .alert)
+        dialog.addTextField()
+
+        let submitAction = UIAlertAction(title: "Speichern", style: .default) { [unowned dialog] _ in
+            if let responseInfo = self.responseInfo {
+                // save result locally in CoreData
+                CoreDataManager.shared.createMeasurement(
+                    title: "\(dialog.textFields![0].text ?? "")",
+                    dateTime: Date.now,
+                    detailLevel: responseInfo.detailLevel,
+                    featureSensitivity: responseInfo.featureSensitivity,
+                    measurementTime: responseInfo.measurementTimeInSeconds,
+                    volume: responseInfo.volumeInCM3)
+                
+                // navigate to measurements screen
+                let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
+                    withIdentifier: Constants.SID_VC_Measurement) as! MeasurementsViewController
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: false, completion: nil)
+            }
         }
-        
-        guard let foodInfoObj = self.foodInfo else {
-            return UITableViewCell()
-        }
-        
-        // show food information based on selected segment control value
-        switch self.segControl.selectedSegmentIndex {
-        case 0:
-            customCell.configure(foodInfoItem: foodInfoObj.general[indexPath.row])
-        case 1:
-            customCell.configure(foodInfoItem: foodInfoObj.macronutrients[indexPath.row])
-        case 2:
-            customCell.configure(foodInfoItem: foodInfoObj.micronutrients[indexPath.row])
-        default:
-            customCell.configure(foodInfoItem: foodInfoObj.general[indexPath.row])
-        }
-        
-        return customCell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+
+        dialog.addAction(submitAction)
+        dialog.addAction(UIAlertAction(title: "Abbrechen", style: .cancel, handler: nil))
+        self.present(dialog, animated: true)
     }
     
     // function gets called when the file download has been finished
@@ -82,12 +69,6 @@ class ResultViewController: UIViewController, URLSessionDownloadDelegate, UITabl
         }
         
         self.setupSceneModel()
-    }
-    
-    // function for toggling the segment control
-    @IBAction func toggleSegmentControl(_ sender: UISegmentedControl) {
-        // reload the table view with new content based on the selected segment control
-        self.tableView.reloadData()
     }
     
     // function downloads the generated 3d model file from the server api endpoint
