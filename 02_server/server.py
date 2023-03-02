@@ -2,9 +2,6 @@ import os
 import shutil
 import subprocess
 import pyvista
-import trimesh
-import boto3
-import requests
 import time
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
@@ -14,18 +11,11 @@ app = FastAPI()
 
 #region Configuration
 
-# aws rekognition api parameters
-awsApiService = "rekognition"
-awsApiRegion = "eu-central-1"
-awsApiAccessKeyId = "AKIAYTMG3KDEHZLDPCOP"
-awsApiSecretKey = "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"
-
 # local parameters
 pathExecutable = "/Users/nico/Desktop/FoodAnalyser/02_server/ObjectCaptureApi"
 pathInputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/input"
 pathOutputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/output"
 pathModelFile = f"{pathOutputFolder}/baked_mesh.obj"
-densityCsvFilePath = "/Users/nico/Desktop/FoodAnalyser/02_server/density.csv"
 
 # object capture api detail level (preview, reduced, medium, full, raw)
 detailLevel = "medium" # default
@@ -35,48 +25,6 @@ sampleOrdering = "sequential" # default
 
 # object capture api feature sensitivity (normal, high)
 featureSensitivity = "normal" # default
-
-# search api url for food data central
-foodDataCentralApiUrl = "https://api.nal.usda.gov/fdc/v1/foods/search"
-
-# food data central request
-foodDataCentralApiParams = {
-    "dataType" : "SR Legacy",
-    "pageSize" : "1",
-    "pageNumber" : "1",
-    "sortBy" : "dataType.keyword",
-    "sortOrder" : "asc",
-    "api_key" : "AIU73hcuBV0CSApK6s3qkzgV3tWfYjUaHFuH1cig"
-}
-
-# list with all relevant nutrients
-relevantNutrients = [
-    "protein",
-    "sugars",
-    "water",
-    "energy",
-    "carbohydrate",
-    "total lipid (fat)",
-    "magnesium",
-    "calcium",
-    "zinc",
-    "sodium",
-    "alcohol",
-    "vitamin a",
-    "vitamin b-12",
-    "vitamin c",
-    "vitamin d",
-    "vitamin e",
-    "vitamin k",
-    "sucrose",
-    "glucose",
-    "maltose",
-    "copper",
-    "iron",
-    "phosphorusv",
-    "selenium",
-    "caffeine"
-]
 
 #endregion
 
@@ -105,96 +53,7 @@ async def UploadImage(file: UploadFile = File(...)):
 @app.get("/analyse-object")
 async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
     try:
-        #region 1. Identify object with image classification by AWS Rekognition API
-        
-        dirList = os.listdir(pathInputFolder)
-        if len(dirList) == 0:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "No input images could be found. Please upload input images first."
-            }
-        
-        # create path variables
-        pathInputImageHeic = f"{pathInputFolder}/{dirList[0]}"
-        pathInputImageJpg = pathInputImageHeic.replace(".heic", ".jpg")
-
-        # convert image format from .heic to .jpg
-        cp = subprocess.run(
-            [f"magick {pathInputImageHeic} {pathInputImageJpg}"],
-            check=True,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-
-        # check if jpg image file exists
-        if os.path.exists(pathInputImageJpg) == False:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not convert image from .heic to .jpg format."
-            }
-
-        # create aws rekognition api client
-        client = boto3.client(
-            awsApiService,
-            aws_access_key_id = awsApiAccessKeyId,
-            aws_secret_access_key = awsApiSecretKey,
-            region_name = awsApiRegion)
-
-        # get raw image file bytes
-        with open(pathInputImageJpg, "rb") as src_image:
-            src_bytes = src_image.read()
-
-        # call aws rekognition api with parameters
-        response = client.detect_labels(
-            Image={'Bytes': src_bytes},
-            MaxLabels=10,
-            MinConfidence = 90)
-
-        # transform api response and get object label
-        objectLabel = ""
-        objectLabelConfidence = 0.0
-        for label in response['Labels']:
-            if not label['Instances']:
-                continue
-            else:
-                objectLabel = label['Name'].lower()
-                objectLabelConfidence = label['Confidence']
-                break
-
-        if objectLabel == "":
-            return {
-                "statusCode" : 500,
-                "errorMessage" : f"Could not identify the input object."
-            }
-
-        #endregion
-
-        #region 2. Fetch food density information from FoodData Central API
-
-        # call the FoodData Central api
-        foodDataCentralApiParams["query"] = objectLabel.lower().strip()
-        foodDataCentralApiParams["dataset"] = "generalsV2"
-        response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
-        
-        data = response.json()
-        if not data:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not fetch food density information from FoodData Central API."
-            }
-
-        # extract density information from api response
-        objectDensity = data["foods"][0]["foodGenerals"]["density"]
-        if not objectDensity:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not extract food density information from API response."
-            }
-
-        #endregion
-
-        #region 3. Generate the 3D model by Object Capture API
+        #region 1. Generate the 3D model by Object Capture API
         
         # set detail level parameter for object capture api
         dl = detailLevel # default = medium
@@ -227,124 +86,26 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
 
         #endregion
 
-        #region 4. Calculate object volume and weight
+        #region 2. Calculate object volume
 
         # calculate object volume of generated 3d model by PyVista library
         pyvistaMesh = pyvista.read(pathModelFile)
-        pyvistaVolumeCM3 = pyvistaMesh.volume * 1000000
+        pyvistaVolumeCM3 = round((pyvistaMesh.volume * 1000000), 4)
         
-        # calculate object volume of generated 3d model by Trimesh library
-        trimeshMesh = trimesh.load(pathModelFile)
-        trimeshVolumeCM3 = trimeshMesh.volume * 1000000
-        
-        # calculate object weight
-        # formula: m = p * V
-        pyvistaWeightInGrams = objectDensity * pyvistaVolumeCM3
-        trimeshWeightInGrams = objectDensity * trimeshVolumeCM3
-
-        #endregion
-
-        #region 5. Fetch food nutrient information from FoodData Central API
-
-        # call the FoodData Central api
-        foodDataCentralApiParams["query"] = objectLabel.lower().strip()
-        foodDataCentralApiParams["dataset"] = "nutrientsV2"
-        response = requests.get(url = foodDataCentralApiUrl, params = foodDataCentralApiParams)
-        
-        data = response.json()
-        if not data:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not fetch food nutrient information from FoodData Central API."
-            }
-
-        # extract raw food nutrients from api response
-        nutrientsRaw = data["foods"][0]["foodNutrients"]
-        if not nutrientsRaw:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not extract raw food nutrient information from API response."
-            }
-        
-        nutrients = {}
-        for nutrient in nutrientsRaw:
-            nutrientName = nutrient["nutrientName"].lower()
-            if any(substring in nutrientName for substring in relevantNutrients):
-                #region transform nutrient information
-
-                if nutrientName == "total lipid (fat)":
-                    nutrientName = "fat"
-
-                nutrientName = nutrientName.split(", ", 1)[0]
-                nutrientName = nutrientName.split(" (", 1)[0]
-
-                # differ nutrient energy values
-                if nutrient["nutrientId"] == 1062: 
-                    nutrientName = "kJ"
-                elif nutrient["nutrientId"] == 1008:
-                    nutrientName = "kcal"
-
-                if nutrientName == "carbohydrate":
-                    nutrientName = "carbohydrates"
-
-                # remove spaces in nutrient name
-                arrSpace = nutrientName.split(" ", 1)
-                if len(arrSpace) == 2:
-                    nutrientName = arrSpace[0] + arrSpace[1].upper()
-
-                # remove hyphen in nutrient name
-                nutrientName = nutrientName.replace("-", "")
-
-                #endregion
-
-                # calculate real object nutrients by object weight
-                nutrients[nutrientName] = (pyvistaWeightInGrams * nutrient["value"]) / 100
-
-        if not nutrients or len(nutrients) == 0:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not extract food nutrient information."
-            }
-        
-        #endregion
-
-        #region 6. Delete uploaded input images and generated 3D model
-
-        # delete all files in the server api input folder
-        for file in os.listdir(pathInputFolder):
-            os.remove(os.path.join(pathInputFolder, file))
-
-        # delete all files in the server api output folder
-        for file in os.listdir(pathOutputFolder):
-            os.remove(os.path.join(pathOutputFolder, file))
-
         #endregion
 
         return {
             "statusCode" : 200,
-            "label" : objectLabel,
-            "confidence" : objectLabelConfidence,
-            "density" : objectDensity,
             "detailLevel": dl,
             "featureSensitivity": fs,
-            "measurementTimeInSeconds": measurementTimeInSeconds,
-            "pyvista": {
-                "usedLibrary" : "PyVista v0.36.1",
-                "volumeInCM3" : pyvistaVolumeCM3,
-                "weightInGrams" : pyvistaWeightInGrams
-            },
-            "trimesh": {
-                "usedLibrary" : "Trimesh v3.16.2",
-                "volumeInCM3" : trimeshVolumeCM3,
-                "weightInGrams" : trimeshWeightInGrams
-            },
-            "nutrients": nutrients
+            "volumeInCM3" : pyvistaVolumeCM3,
+            "measurementTimeInSeconds": measurementTimeInSeconds
         }
 
     except Exception as e:
         return {
             "statusCode" : 500,
-            "errorMessage" : f"Could not analyse the input object due to: '{e}'"
+            "errorMessage" : f"Could not analyse the object due to: '{e}'"
         }
 
 # endpoint for getting the generated 3d model file
