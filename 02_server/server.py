@@ -34,10 +34,9 @@ async def Alive():
 @app.post("/upload-image")
 async def UploadImage(file: UploadFile = File(...)):
     try:
-        # store received (uploaded) image on local disk
+        # store received / uploaded image on local disk
         with open(f'{pathInputFolder}/{file.filename}', 'wb') as buffer:
             shutil.copyfileobj(file.file, buffer)
-        
         return { "statusCode" : 200 }
         
     except Exception as e:
