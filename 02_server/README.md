@@ -2,8 +2,8 @@
 - Required Python Version: 3.10.8
 
 ### Folder structure
-/input = folder for storing the uploaded images
-/output = folder for storing the generated 3D models
+./input = folder for storing the uploaded images
+./output = folder for storing the generated 3D model
 
 ### Create virtual environment:
 1. python3 -m venv ./venv

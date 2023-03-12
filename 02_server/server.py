@@ -39,12 +39,6 @@ async def UploadImage(file: UploadFile = File(...)):
 @app.get("/analyse-object")
 async def AnalyseObject(dl: str, fs: str):
     try:
-        # configuration
-        pathExecutable = "/Users/nico/Desktop/FoodAnalyser/02_server/ObjectCaptureApi"
-        pathInputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/input"
-        pathOutputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/output"
-        pathModelFile = f"{pathOutputFolder}/baked_mesh.obj"
-
         # call object capture api as command executable
         start = time.time()
         cp = subprocess.run(
