@@ -3,7 +3,7 @@ import UIKit
 struct Constants {
     
     // storyboard
-    static let SYB_Name = "Main"
+    static let SYB_Name = "Storyboard"
     
     // view controller
     static let SID_VC_Instruction = "SID_VC_Instruction"

@@ -59,8 +59,8 @@ class ProcessingViewController: UIViewController {
         
         // append request url get parameters
         urlComponents.queryItems = [
-            URLQueryItem(name: "detailLevelOption", value: detailLevel),
-            URLQueryItem(name: "featureSensitivityOption", value: featureSensitivity)
+            URLQueryItem(name: "dl", value: detailLevel),
+            URLQueryItem(name: "fs", value: featureSensitivity)
         ]
         
         guard let url = urlComponents.url else {
@@ -76,7 +76,7 @@ class ProcessingViewController: UIViewController {
         
         // increase default timeout limit because the 3d model generation process takes longer than 60 sec. (default)
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 3600 // 60 min.
+        configuration.timeoutIntervalForRequest = 2700 // 45 min.
         
         // create session with custom configuration
         let session = URLSession(configuration: configuration)
@@ -95,20 +95,26 @@ class ProcessingViewController: UIViewController {
                 self.stopTimer()
                 
                 if let responseInfo = try? JSONDecoder().decode(ResponseInfo.self, from: responseData) {
-                    print(">>> [INFO] API status code: \(responseInfo.statusCode)")
-                    print(">>> [INFO] FoodInfo object is available")
                     
-                    // show result view with collected food information
-                    DispatchQueue.main.async {
-                        let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
-                            withIdentifier: Constants.SID_VC_Result) as! ResultViewController
-                        vc.modalPresentationStyle = .fullScreen
-                        vc.responseInfo = responseInfo
-                        self.present(vc, animated: false, completion: nil)
+                    if responseInfo.statusCode == 200 {
+                        print(">>> [INFO] ResponseInfo object is available")
+                        
+                        // navigate to result view controller for presentation
+                        DispatchQueue.main.async {
+                            let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
+                                withIdentifier: Constants.SID_VC_Result) as! ResultViewController
+                            vc.modalPresentationStyle = .fullScreen
+                            vc.responseInfo = responseInfo
+                            self.present(vc, animated: false, completion: nil)
+                        }
+                    } else {
+                        print(">>> [ERROR] Response was unsuccessful")
+                        self.showError()
+                        return
                     }
                     
                 } else {
-                    print(">>> [ERROR] Could not create food info object from response data")
+                    print(">>> [ERROR] Could not create ResponseInfo object from response data")
                     self.showError()
                     return
                 }

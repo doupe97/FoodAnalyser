@@ -27,7 +27,7 @@ class ResultViewController: UIViewController, URLSessionDownloadDelegate {
     }
     
     // function gets called when user taps on Speichern button
-    @IBAction func btnSaveResult(_ sender: UIButton) {
+    @IBAction func pressedSaveResult(_ sender: UIButton) {
         let dialog = UIAlertController(title: "Speicherung", message: "Bitte geben Sie eine Bezeichnung für diese Messung an.", preferredStyle: .alert)
         dialog.addTextField()
 

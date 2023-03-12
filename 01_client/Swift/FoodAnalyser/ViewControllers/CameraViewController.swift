@@ -16,14 +16,16 @@ class CameraViewController: UIViewController {
     private var isSessionRunning = false
     private let sessionQueue = DispatchQueue(label: "session queue")
     private var setupResult: SessionSetupResult = .success
-    private let locationManager = CLLocationManager()
     private var spinner: UIActivityIndicatorView!
-    private let audioSession = AVAudioSession.sharedInstance()
-    private var audioLevel: Float = 0.0
     private let photoOutput = AVCapturePhotoOutput()
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
     private let preferredWidthResolution = 1920
     private var keyValueObservations = [NSKeyValueObservation]()
+    
+    // fliegt raus
+    private let audioSession = AVAudioSession.sharedInstance()
+    private var audioLevel: Float = 0.0
+    
     @objc dynamic var deviceInput: AVCaptureDeviceInput!
     
     @IBOutlet weak var photoButton: UIButton!
@@ -38,8 +40,11 @@ class CameraViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // setup menu buttons for object capture configuration
         self.setupMenuButtons()
         
+        // disable all ui elements
+        // fliegt raus
         photoButton.isEnabled = false
         readyButton.isEnabled = false
         detailLevelButton.isEnabled = false
@@ -48,39 +53,35 @@ class CameraViewController: UIViewController {
         // setup the preview view for photo capture and spinner
         previewView.session = captureSession
 		
-        // check for device component access permissions
+        // check app permission for camera access
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized:
-            // The user has previously granted access to the camera.
-            break
             
-        case .notDetermined:
-            /*
-             The user has not yet been presented with the option to grant
-             video access. Suspend the session queue to delay session
-             setup until the access request has completed.
-             
-             Note that audio access will be implicitly requested when we
-             create an AVCaptureDeviceInput for audio during session setup.
-             */
-            sessionQueue.suspend()
-            AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
-                if !granted {
-                    self.setupResult = .notAuthorized
-                }
-                self.sessionQueue.resume()
-            })
+            // the user has granted camera access
+            case .authorized:
+                break
             
-        default:
-            // user has denied access permissions
-            setupResult = .notAuthorized
+            // the user has not yet granted camera access
+            case .notDetermined:
+                sessionQueue.suspend()
+                AVCaptureDevice.requestAccess(for: .video, completionHandler: { granted in
+                    if !granted {
+                        self.setupResult = .notAuthorized
+                    }
+                    self.sessionQueue.resume()
+                })
+            
+            // the user has denied camera access
+            default:
+                setupResult = .notAuthorized
         }
         
-        // configureSession has to be called in sessionQueue (async)
+        // configureSession has to be called in sessionQueue
         sessionQueue.async {
             self.configureSession()
         }
         
+        // show spinner for loading animation
+        // fliegt raus
         DispatchQueue.main.async {
             self.spinner = UIActivityIndicatorView(style: .large)
             self.spinner.color = UIColor.yellow
@@ -91,34 +92,36 @@ class CameraViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // check app permissions
+        // check app permission for camera access
         sessionQueue.async {
             switch self.setupResult {
-            case .success:
-                // Only setup observers and start the session if setup succeeded.
-                self.addObservers()
-                self.captureSession.startRunning()
-                self.isSessionRunning = self.captureSession.isRunning
-                
-            case .notAuthorized:
-                DispatchQueue.main.async {
-                    let alertController = UIAlertController(title: "FoodAnalyser", message: "FoodAnalyser does not have permission to use the camera.", preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-                    self.present(alertController, animated: true, completion: nil)
-                }
-                
-            default:
-                DispatchQueue.main.async {
-                    let alertController = UIAlertController(title: "FoodAnalyser", message: "Es ist ein Fehler aufgetreten", preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-                    self.present(alertController, animated: true, completion: nil)
-                }
+                // start capture session
+                case .success:
+                    self.addObservers()
+                    self.captureSession.startRunning()
+                    self.isSessionRunning = self.captureSession.isRunning
+                    
+                case .notAuthorized:
+                    DispatchQueue.main.async {
+                        let alertController = UIAlertController(title: "FoodAnalyser", message: "FoodAnalyser verfügt über keine Berechtigungen zur Nutzung der Gerätekamera.", preferredStyle: .alert)
+                        alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                        self.present(alertController, animated: true, completion: nil)
+                    }
+                    
+                default:
+                    DispatchQueue.main.async {
+                        let alertController = UIAlertController(title: "FoodAnalyser", message: "Es ist ein Fehler aufgetreten", preferredStyle: .alert)
+                        alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                        self.present(alertController, animated: true, completion: nil)
+                    }
             }
         }
         
+        // fliegt raus
         registerVolumeButtonObserver()
     }
     
+    // fliegt raus
     override func viewWillDisappear(_ animated: Bool) {
         // stop capture session and remove observers
         sessionQueue.async {
@@ -134,8 +137,7 @@ class CameraViewController: UIViewController {
     
     
     
-    // MARK: Session Management
-    
+    // function configures the capture session
     fileprivate func configureSession() {
         if setupResult != .success { return }
         
@@ -223,11 +225,79 @@ class CameraViewController: UIViewController {
         captureSession.commitConfiguration()
     }
     
+    // function setups the menu buttons for setting the object capture configuration
+    fileprivate func setupMenuButtons() {
+        let tapAction = { (action: UIAction) in }
+        
+        // setup items for detail level menu button
+        self.detailLevelButton.menu = UIMenu(children: [
+            UIAction(title: "Preview", handler: tapAction),
+            UIAction(title: "Reduced", handler: tapAction),
+            UIAction(title: "Medium", state: .on, handler: tapAction),
+            UIAction(title: "Full", handler: tapAction)
+        ])
+        self.detailLevelButton.showsMenuAsPrimaryAction = true
+        
+        // setup items for feature sensitivity menu button
+        self.featureSensitivityButton.menu = UIMenu(children: [
+            UIAction(title: "Normal", state: .on, handler: tapAction),
+            UIAction(title: "High", handler: tapAction)
+        ])
+        self.featureSensitivityButton.showsMenuAsPrimaryAction = true
+    }
     
+    // function uploads captured image to server
+    fileprivate func uploadImage(_ imageData: Data) {
+        // get the server api url for uploading an image
+        guard let url: URL = URL(string: Constants.SRV_API_UploadImage) else {
+            print(">>> [ERROR] Could not get server api url for image upload")
+            return
+        }
+        
+        // create unique UUID for image file and media type for upload
+        let fileName = UUID().uuidString
+        guard let mediaImage = Media(imageData: imageData, fileName: fileName, key: "file") else {
+            print(">>> [ERROR] Could not create media image")
+            return
+        }
+        
+        // create request object
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let boundary: String = "Boundary-\(NSUUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        // define request body
+        let dataBody = createDataBody(media: [mediaImage], boundary: boundary)
+        request.httpBody = dataBody
+        
+        // call server api for image uploading
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let data = data {
+                do {
+                    // if success, serialize response to JSON
+                    let json = try JSONSerialization.jsonObject(with: data, options: [])
+                    let result = "\(json)"
+                    if result.contains("200") {
+                        print(">>> [INFO] Image was successfully uploaded")
+                        
+                        // increase photo counter for UI
+                        DispatchQueue.main.async {
+                            let newPhotoCounterValue = String("\((Int(self.photoCounter.text ?? "0") ?? 0) + 1)")
+                            self.photoCounter.text = newPhotoCounterValue
+                            print(">>> [INFO] Photo counter: \(newPhotoCounterValue)")
+                        }
+                    }
+                } catch {
+                    print(">>> [ERROR] Failed to upload image due to: '\(error)'")
+                }
+            }
+        }.resume()
+    }
     
-    // MARK: Capturing Photos
-    
-    @IBAction private func capturePhoto(_ photoButton: UIButton) {
+    // button event listener: captures a photo
+    @IBAction private func captureImage(_ photoButton: UIButton) {
         sessionQueue.async {
             var photoSettings = AVCapturePhotoSettings()
             
@@ -236,22 +306,16 @@ class CameraViewController: UIViewController {
                 photoSettings = AVCapturePhotoSettings(format: [
                     kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
                 ])
-            } else {
-                photoSettings = AVCapturePhotoSettings()
             }
             
             // important: set output format before enabling depth data delivery!
-            // set photo output format to .heif (.heif format is more compressed than .jpeg)
             if self.photoOutput.availablePhotoCodecTypes.contains(.hevc) {
                 photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
             }
             
-            // important: set depth data settings after setting photo output format!
-            // required photo setting: capture photo depth data
-            // required photo setting: embed the depth map into the .heic output file
-            photoSettings.isDepthDataDeliveryEnabled = true
-            photoSettings.isDepthDataFiltered = false // default is true
-            photoSettings.embedsDepthDataInPhoto = true // includes depth map in .heic output file
+            // includes unfiltered depth info in image file
+            photoSettings.isDepthDataFiltered = false
+            photoSettings.embedsDepthDataInPhoto = true
             
             // optional photo settings for better quality
             photoSettings.flashMode = .off
@@ -288,8 +352,7 @@ class CameraViewController: UIViewController {
                         self.spinner.stopAnimating()
                     }
                 }
-            }
-            )
+            })
             
             // call capture method
             self.inProgressPhotoCaptureDelegates[photoCaptureProcessor.requestedPhotoSettings.uniqueID] = photoCaptureProcessor
@@ -297,30 +360,7 @@ class CameraViewController: UIViewController {
         }
     }
     
-    
-    
-    // MARK: Button Functions
-    
-    fileprivate func setupMenuButtons() {
-        let tapAction = { (action: UIAction) in }
-        
-        // setup items for detail level menu button
-        self.detailLevelButton.menu = UIMenu(children: [
-            UIAction(title: "Preview", handler: tapAction),
-            UIAction(title: "Reduced", handler: tapAction),
-            UIAction(title: "Medium", state: .on, handler: tapAction),
-            UIAction(title: "Full", handler: tapAction)
-        ])
-        self.detailLevelButton.showsMenuAsPrimaryAction = true
-        
-        // setup items for feature sensitivity menu button
-        self.featureSensitivityButton.menu = UIMenu(children: [
-            UIAction(title: "Normal", handler: tapAction),
-            UIAction(title: "High", handler: tapAction)
-        ])
-        self.featureSensitivityButton.showsMenuAsPrimaryAction = true
-    }
-    
+    // button event listener: finishes photo capturing, starts server processing
     @IBAction func finishCapturing(_ sender: UIButton) {
         guard let detailLevel = self.detailLevelButton.menu?.selectedElements.first?.title.lowercased() else {
             return
@@ -357,60 +397,17 @@ class CameraViewController: UIViewController {
     }
     
     
-    // MARK: Functions for image upload
     
-    fileprivate func uploadImage(_ imageData: Data) {
-        // get the server api url for uploading an image
-        guard let url: URL = URL(string: Constants.SRV_API_UploadImage) else {
-            print(">>> [ERROR] Could not get server api url for image upload")
-            return
-        }
-        
-        // create unique UUID for image file and media type for upload
-        let fileName = UUID().uuidString
-        guard let mediaImage = Media(imageData: imageData, fileName: fileName, key: "file") else {
-            print(">>> [ERROR] Could not create media image")
-            return
-        }
-        
-        // create request object
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        let boundary: String = "Boundary-\(NSUUID().uuidString)"
-        
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
-        // define request body
-        let dataBody = createDataBody(media: [mediaImage], boundary: boundary)
-        request.httpBody = dataBody
-        
-        // call server api for image uploading
-        URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let data = data {
-                do {
-                    // if success, serialize response to JSON
-                    let json = try JSONSerialization.jsonObject(with: data, options: [])
-                    let result = "\(json)"
-                    if result.contains("200") {
-                        print(">>> [INFO] Image was successfully uploaded")
-                        
-                        // increase photo counter for UI
-                        DispatchQueue.main.async {
-                            let newPhotoCounterValue = String("\((Int(self.photoCounter.text ?? "0") ?? 0) + 1)")
-                            self.photoCounter.text = newPhotoCounterValue
-                            print(">>> [INFO] Photo counter: \(newPhotoCounterValue)")
-                        }
-                    }
-                } catch {
-                    print(">>> [ERROR] Failed to upload image due to: '\(error)'")
-                }
-            }
-        }.resume()
-    }
     
+    
+    
+    
+    
+    
+    
+    
+    // function creates the POST request data body for the image upload
     fileprivate func createDataBody(media: [Media]?, boundary: String) -> Data {
-        // function creates and returns the request data body for image uploading
         let lineBreak = "\r\n"
         var body = Data()
         
@@ -481,7 +478,7 @@ class CameraViewController: UIViewController {
             
             // if the volume has not been reset, capture new photo
             if (audioLevel > 0.2) {
-                capturePhoto(self.photoButton)
+                captureImage(self.photoButton)
             }
             
             // reset audio volume if volume reaches max level

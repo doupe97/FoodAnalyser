@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="zuf-29-tqF">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -85,7 +84,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="capturePhoto:" destination="BYZ-38-t0r" eventType="touchUpInside" id="o5K-SC-fYn"/>
+                                    <action selector="captureImage:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EgS-ug-PYk"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZYP-wB-Smw">
@@ -417,7 +416,6 @@
                                 </buttonConfiguration>
                                 <connections>
                                     <action selector="btnSaveResult:" destination="EOS-3C-UIU" eventType="touchUpInside" id="n1k-K3-m9F"/>
-                                    <action selector="pressedStartButton:" destination="zuf-29-tqF" eventType="touchUpInside" id="nue-W5-GdL"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="123,4567 sec." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eMV-kx-2Xp">
@@ -604,8 +602,6 @@
                         <outlet property="instructionImage" destination="OIg-gX-spR" id="UDJ-B8-liF"/>
                         <outlet property="instructionTitle" destination="cv7-nb-JP6" id="wA6-76-nmk"/>
                         <outlet property="intructionTextView" destination="BlG-1v-pnF" id="cem-nC-ReR"/>
-                        <outlet property="nextInstructionButton" destination="V8Q-OL-Z6L" id="M4j-tL-Wgk"/>
-                        <outlet property="prevInstructionButton" destination="fjf-tR-Fur" id="z5s-04-YWH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="65U-gN-jVX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

@@ -5,8 +5,6 @@ class InstructionViewController: UIViewController {
     @IBOutlet weak var instructionImage: UIImageView!
     @IBOutlet weak var instructionTitle: UILabel!
     @IBOutlet weak var intructionTextView: UITextView!
-    @IBOutlet weak var nextInstructionButton: UIButton!
-    @IBOutlet weak var prevInstructionButton: UIButton!
     
     private var instructions = [Instruction]()
     private var currentInstructionNumber: Int = 1
@@ -17,8 +15,8 @@ class InstructionViewController: UIViewController {
         self.changeInstruction()
     }
     
+    // function defines the instruction screens
     fileprivate func setupInstructions() {
-        // function defines the instruction screens
         self.instructions.append(Instruction(
             id: 1,
             title: "Einführung",
@@ -50,8 +48,8 @@ class InstructionViewController: UIViewController {
             imageName: "InstructionImage5"))
     }
     
+    // function updates the instruction ui components with new values
     fileprivate func changeInstruction() {
-        // function updates the instruction ui components with new values
         if (self.currentInstructionNumber >= 1 && self.currentInstructionNumber <= self.instructions.count) {
             let pageNumber: Int = self.currentInstructionNumber - 1
             let instruction = self.instructions[pageNumber]
@@ -65,8 +63,9 @@ class InstructionViewController: UIViewController {
         }
     }
     
+    // function show the received error
     fileprivate func showError() {
-        print(">>> [ERROR] Sevrer API is unavailable")
+        print(">>> [ERROR] Server API is unavailable")
         DispatchQueue.main.async {
             let alertController = UIAlertController(
                 title: "Fehler",
@@ -78,6 +77,7 @@ class InstructionViewController: UIViewController {
         }
     }
     
+    // button event listener: shows previous instruction
     @IBAction func pressedPrevButton(_ sender: UIButton) {
         // show the previous instruction in the ui
         if (self.currentInstructionNumber == 1) {
@@ -88,6 +88,7 @@ class InstructionViewController: UIViewController {
         self.changeInstruction()
     }
     
+    // button event listener: shows next instruction
     @IBAction func pressedNextButton(_ sender: UIButton) {
         // show the next instruction in the ui
         if (self.currentInstructionNumber == self.instructions.count) {
@@ -98,6 +99,15 @@ class InstructionViewController: UIViewController {
         self.changeInstruction()
     }
     
+    // button event listener: shows measurements screen
+    @IBAction func pressedMeasurementsButton(_ sender: UIButton) {
+        let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
+            withIdentifier: Constants.SID_VC_Measurement) as! MeasurementsViewController
+        vc.modalPresentationStyle = .fullScreen
+        self.present(vc, animated: false, completion: nil)
+    }
+    
+    // button event listener: starts new measurement
     @IBAction func pressedStartButton(_ sender: Any) {
         print(">>> [INFO] Check if server api is available")
         
@@ -122,7 +132,8 @@ class InstructionViewController: UIViewController {
                 if response.statusCode == 200 {
                     print(">>> [INFO] Server API is available")
                     
-                    // show camera view controller if the server api is available
+                    // the server api is available
+                    // navigate to camera view controller
                     DispatchQueue.main.async {
                         let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
                             withIdentifier: Constants.SID_VC_Camera) as! CameraViewController
@@ -138,12 +149,5 @@ class InstructionViewController: UIViewController {
                 return
             }
         }.resume()
-    }
-    
-    @IBAction func pressedMeasurementsButton(_ sender: UIButton) {
-        let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(
-            withIdentifier: Constants.SID_VC_Measurement) as! MeasurementsViewController
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: false, completion: nil)
     }
 }

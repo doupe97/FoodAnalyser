@@ -24,9 +24,8 @@
 		03E94FC3293F608300B769EF /* ResponseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E94FC2293F608300B769EF /* ResponseInfo.swift */; };
 		7AA677151CFF765600B353FB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA677141CFF765600B353FB /* AppDelegate.swift */; };
 		7AA677171CFF765600B353FB /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA677161CFF765600B353FB /* CameraViewController.swift */; };
-		7AA6771A1CFF765600B353FB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AA677181CFF765600B353FB /* Main.storyboard */; };
+		7AA6771A1CFF765600B353FB /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AA677181CFF765600B353FB /* Storyboard.storyboard */; };
 		7AA6771C1CFF765600B353FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AA6771B1CFF765600B353FB /* Assets.xcassets */; };
-		7AA6771F1CFF765600B353FB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AA6771D1CFF765600B353FB /* LaunchScreen.storyboard */; };
 		7AA677271CFF774800B353FB /* PhotoCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA677261CFF774800B353FB /* PhotoCaptureDelegate.swift */; };
 		7AA677291CFF7B5C00B353FB /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA677281CFF7B5C00B353FB /* PreviewView.swift */; };
 /* End PBXBuildFile section */
@@ -50,9 +49,8 @@
 		7AA677111CFF765600B353FB /* FoodAnalyser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoodAnalyser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AA677141CFF765600B353FB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AA677161CFF765600B353FB /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
-		7AA677191CFF765600B353FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7AA677191CFF765600B353FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Storyboard.storyboard; sourceTree = "<group>"; };
 		7AA6771B1CFF765600B353FB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7AA6771E1CFF765600B353FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7AA677201CFF765600B353FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7AA677261CFF774800B353FB /* PhotoCaptureDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCaptureDelegate.swift; sourceTree = "<group>"; };
 		7AA677281CFF7B5C00B353FB /* PreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
@@ -95,8 +93,8 @@
 		03ACDFA8293DF67800EF8C77 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				7AA677161CFF765600B353FB /* CameraViewController.swift */,
 				032040602939120E00F7518A /* InstructionViewController.swift */,
+				7AA677161CFF765600B353FB /* CameraViewController.swift */,
 				037BA1A2293D194E0050DDE9 /* ProcessingViewController.swift */,
 				03E94FC0293F605D00B769EF /* ResultViewController.swift */,
 				03E071AF29B0F46A0054D1BD /* MeasurementsViewController.swift */,
@@ -159,8 +157,7 @@
 				03E94FB7293E1B3700B769EF /* Media */,
 				032040622939132B00F7518A /* Models */,
 				03ACDFA8293DF67800EF8C77 /* ViewControllers */,
-				7AA677181CFF765600B353FB /* Main.storyboard */,
-				7AA6771D1CFF765600B353FB /* LaunchScreen.storyboard */,
+				7AA677181CFF765600B353FB /* Storyboard.storyboard */,
 				7AA6771B1CFF765600B353FB /* Assets.xcassets */,
 				7AA677201CFF765600B353FB /* Info.plist */,
 				03E071D429B0FA050054D1BD /* CoreData.xcdatamodeld */,
@@ -237,11 +234,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7AA6771F1CFF765600B353FB /* LaunchScreen.storyboard in Resources */,
 				7AA6771C1CFF765600B353FB /* Assets.xcassets in Resources */,
 				03E06CDD2943ACEC00917E2D /* TVCLMeasurementInfo.xib in Resources */,
 				03E94FBB293E5EB500B769EF /* loading.gif in Resources */,
-				7AA6771A1CFF765600B353FB /* Main.storyboard in Resources */,
+				7AA6771A1CFF765600B353FB /* Storyboard.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,20 +271,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		7AA677181CFF765600B353FB /* Main.storyboard */ = {
+		7AA677181CFF765600B353FB /* Storyboard.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				7AA677191CFF765600B353FB /* Base */,
 			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		7AA6771D1CFF765600B353FB /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7AA6771E1CFF765600B353FB /* Base */,
-			);
-			name = LaunchScreen.storyboard;
+			name = Storyboard.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -421,7 +409,7 @@
 				INFOPLIST_FILE = FoodAnalyser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Food Analyser";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.AVCam${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -442,7 +430,7 @@
 				INFOPLIST_FILE = FoodAnalyser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Food Analyser";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.AVCam${SAMPLE_CODE_DISAMBIGUATOR}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
