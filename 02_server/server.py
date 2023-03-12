@@ -9,21 +9,11 @@ from fastapi.responses import FileResponse
 # setup the fast api app
 app = FastAPI()
 
-#region Configuration
-
-# local parameters
+# configuration variables
 pathExecutable = "/Users/nico/Desktop/FoodAnalyser/02_server/ObjectCaptureApi"
 pathInputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/input"
 pathOutputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/output"
 pathModelFile = f"{pathOutputFolder}/baked_mesh.obj"
-
-# object capture api detail level (preview, reduced, medium, full, raw)
-detailLevel = "medium" # default
-
-# object capture api feature sensitivity (normal, high)
-featureSensitivity = "normal" # default
-
-#endregion
 
 # endpoint for checking the servers availability
 @app.get("/alive")
@@ -47,20 +37,14 @@ async def UploadImage(file: UploadFile = File(...)):
 
 # endpoint for analysing an object
 @app.get("/analyse-object")
-async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
+async def AnalyseObject(dl: str, fs: str):
     try:
-        #region 1. Generate the 3D model by Object Capture API
-        
-        # set detail level parameter for object capture api
-        dl = detailLevel # default = medium
-        if detailLevelOption:
-            dl = detailLevelOption
+        # configuration
+        pathExecutable = "/Users/nico/Desktop/FoodAnalyser/02_server/ObjectCaptureApi"
+        pathInputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/input"
+        pathOutputFolder = "/Users/nico/Desktop/FoodAnalyser/02_server/output"
+        pathModelFile = f"{pathOutputFolder}/baked_mesh.obj"
 
-        # set feature sensitivity parameter for object capture api
-        fs = featureSensitivity # default = normal
-        if featureSensitivityOption:
-            fs = featureSensitivityOption
-        
         # call object capture api as command executable
         start = time.time()
         cp = subprocess.run(
@@ -71,7 +55,7 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
             stderr=subprocess.PIPE
         )
         end = time.time()
-        measurementTimeInSeconds = round((end - start), 4)
+        measurementTimeInSec = round((end - start), 4)
 
         # check if generated OBJ 3D model file exists
         if os.path.exists(pathModelFile) == False:
@@ -79,23 +63,18 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
                 "statusCode" : 500,
                 "errorMessage" : "Could not generate OBJ 3D model."
             }
-
-        #endregion
-
-        #region 2. Calculate object volume
-
-        # calculate object volume of generated 3d model by PyVista library
-        pyvistaMesh = pyvista.read(pathModelFile)
-        pyvistaVolumeCM3 = round((pyvistaMesh.volume * 1000000), 4)
         
-        #endregion
+        # calculate object volume from 3d model with PyVista
+        mesh = pyvista.read(pathModelFile)
+        volumeInCm3 = round((mesh.volume * 1000000), 4)
 
+        # return measurement result
         return {
             "statusCode" : 200,
             "detailLevel": dl,
             "featureSensitivity": fs,
-            "volumeInCM3" : pyvistaVolumeCM3,
-            "measurementTimeInSeconds": measurementTimeInSeconds
+            "volumeInCm3" : volumeInCm3,
+            "measurementTimeInSec": measurementTimeInSec
         }
 
     except Exception as e:
@@ -104,21 +83,14 @@ async def AnalyseObject(detailLevelOption: str, featureSensitivityOption: str):
             "errorMessage" : f"Could not analyse the object due to: '{e}'"
         }
 
-# endpoint for getting the generated 3d model file
+# endpoint for fetching the generated 3d model file
 @app.get("/get-3d-model", response_class=FileResponse)
 async def Get3DModel():
-    try:
-        # check if 3d model file exists on local disk
-        if os.path.exists(pathModelFile) == False:
-            return {
-                "statusCode" : 500,
-                "errorMessage" : "Could not find source OBJ 3D model."
-            }
-
-        return pathModelFile
-    
-    except Exception as e:
+    # check if 3d model file exists on local disk
+    if os.path.exists(pathModelFile) == False:
         return {
-            "statusCode" : 500,
-            "errorMessage" : f"Could not get OBJ 3D model due to: '{e}'"
+            "statusCode" : 404,
+            "errorMessage" : "The 3D model file does not exist."
         }
+
+    return pathModelFile
