@@ -39,6 +39,11 @@ async def UploadImage(file: UploadFile = File(...)):
 @app.get("/analyse-object")
 async def AnalyseObject(dl: str, fs: str):
     try:
+        # count uploaded input images
+        numberInputImages = -1
+        for _, _, files in os.walk(pathInputFolder):
+            numberInputImages += len(files)
+
         # call object capture api as command executable
         start = time.time()
         cp = subprocess.run(
@@ -51,7 +56,7 @@ async def AnalyseObject(dl: str, fs: str):
         end = time.time()
         measurementTimeInSec = round((end - start), 4)
 
-        # check if generated OBJ 3D model file exists
+        # check if generated 3d model file exists (.obj)
         if os.path.exists(pathModelFile) == False:
             return {
                 "statusCode" : 500,
@@ -68,7 +73,8 @@ async def AnalyseObject(dl: str, fs: str):
             "detailLevel": dl,
             "featureSensitivity": fs,
             "volumeInCm3" : volumeInCm3,
-            "measurementTimeInSec": measurementTimeInSec
+            "measurementTimeInSec": measurementTimeInSec,
+            "numberInputImages": numberInputImages
         }
 
     except Exception as e:
