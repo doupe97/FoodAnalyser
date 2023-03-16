@@ -56,7 +56,7 @@ async def AnalyseObject(dl: str, fs: str):
         end = time.time()
         measurementTimeInSec = round((end - start), 4)
 
-        # check if generated 3d model file exists (.obj)
+        # check if the generated 3d model file was created
         if os.path.exists(pathModelFile) == False:
             return {
                 "statusCode" : 500,
