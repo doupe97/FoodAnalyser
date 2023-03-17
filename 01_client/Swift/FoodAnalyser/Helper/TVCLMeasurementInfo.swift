@@ -9,17 +9,17 @@ class TVCLMeasurementInfo: UITableViewCell {
     
     static let identifier = "TVCLMeasurementInfo"
     
-    // function for getting the associated nib / xib file
-    // the xib file defines the ui for the custom table view cell
+    // function returns nib identifier
     static func nib() -> UINib {
         return UINib(nibName: identifier, bundle: nil)
     }
     
-    // function is called when the custom table view cell is initialized
+    // default function, generates cell nib / styling
     override func awakeFromNib() {
         super.awakeFromNib()
     }
 
+    // default function, sets the cell selection
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
@@ -28,7 +28,7 @@ class TVCLMeasurementInfo: UITableViewCell {
     public func configure(measurement: Measurement) {
         self.labelTitel.text = measurement.title
         self.labelDateTime.text = "\(measurement.dateTime ?? Date.now)"
-        self.labelDetailLevelFeatureSensitivity.text = "\(measurement.detailLevel ?? "") - \(measurement.featureSensitivity ?? "")"
+        self.labelDetailLevelFeatureSensitivity.text = "\(measurement.numberInputImages) Bilder - \(measurement.detailLevel ?? "") - \(measurement.featureSensitivity ?? "")"
         self.labelVolumeMeasurementTime.text = "\(measurement.volume) cm3 - \(measurement.measurementTime) sec."
     }
     

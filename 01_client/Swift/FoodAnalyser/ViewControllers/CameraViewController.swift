@@ -39,7 +39,7 @@ class CameraViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.photoCounter.text = "57"
         // setup menu buttons for object capture configuration
         self.setupMenuButtons()
         
@@ -231,17 +231,18 @@ class CameraViewController: UIViewController {
         
         // setup items for detail level menu button
         self.detailLevelButton.menu = UIMenu(children: [
-            UIAction(title: "Preview", handler: tapAction),
-            UIAction(title: "Reduced", handler: tapAction),
-            UIAction(title: "Medium", state: .on, handler: tapAction),
-            UIAction(title: "Full", handler: tapAction)
+            UIAction(title: "preview", handler: tapAction),
+            UIAction(title: "reduced", handler: tapAction),
+            UIAction(title: "medium", state: .on, handler: tapAction),
+            UIAction(title: "full", handler: tapAction),
+            UIAction(title: "raw", handler: tapAction)
         ])
         self.detailLevelButton.showsMenuAsPrimaryAction = true
         
         // setup items for feature sensitivity menu button
         self.featureSensitivityButton.menu = UIMenu(children: [
-            UIAction(title: "Normal", state: .on, handler: tapAction),
-            UIAction(title: "High", handler: tapAction)
+            UIAction(title: "normal", state: .on, handler: tapAction),
+            UIAction(title: "high", handler: tapAction)
         ])
         self.featureSensitivityButton.showsMenuAsPrimaryAction = true
     }
@@ -395,16 +396,6 @@ class CameraViewController: UIViewController {
         // present the alert in the ui
         self.present(alertController, animated: true, completion: nil)
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     // function creates the POST request data body for the image upload
     fileprivate func createDataBody(media: [Media]?, boundary: String) -> Data {

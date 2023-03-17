@@ -40,8 +40,8 @@ class ProcessingViewController: UIViewController {
         self.requestServerApi(detailLevel: self.detailLevel, featureSensitivity: self.featureSensitivity)
     }
     
+    // function calls the server api for analysing the object
     fileprivate func requestServerApi(detailLevel: String, featureSensitivity: String) {
-        // call the server api for analysing the given object
         print(">>> [INFO] Request server api for analysing object")
         
         // get the server api url for analysing the object
@@ -74,9 +74,9 @@ class ProcessingViewController: UIViewController {
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        // increase default timeout limit because the 3d model generation process takes longer than 60 sec. (default)
+        // increase default timeout limit because the 3d model generation process may take more time
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 2700 // 45 min.
+        configuration.timeoutIntervalForRequest = 2700 // set timeout limit to 45 min.
         
         // create session with custom configuration
         let session = URLSession(configuration: configuration)
@@ -127,8 +127,8 @@ class ProcessingViewController: UIViewController {
         task.resume()
     }
     
+    // function shows error message to user
     fileprivate func showError() {
-        // if there is an error, alert the user in ui
         DispatchQueue.main.async {
             let alertController = UIAlertController(
                 title: "Fehler",
@@ -151,11 +151,11 @@ class ProcessingViewController: UIViewController {
     fileprivate func setupProgressDescriptions() {
         descriptions.append(ProgressDescription(
             title: "Lade Bilder ...",
-            description: "Die aufgenommenen Bilder werden nun von der Server API entgegengenommen, als Eingabe geladen und zur Analyse des vorliegenden Lebensmittels vorbereitet."))
+            description: "Die aufgenommenen Bilder werden nun von dem Server API entgegengenommen, als Eingabe geladen und zur Analyse des vorliegenden Lebensmittels vorbereitet."))
         
         descriptions.append(ProgressDescription(
-            title: "Generiere 3D-Modell ...",
-            description: "Die Object Capture API des RealityKit Frameworks berechnet nun aus der erhaltenen Bilderserie unter Anwendung verschiedener photogrammetrischer Verfahren ein 3D-Modell des Lebensmittels."))
+            title: "Generiere 3D Modell ...",
+            description: "Das Object Capture API des RealityKit Frameworks berechnet nun auf Basis der hochgeladenen Bilder unter Anwendung photogrammetrischer Verfahren ein 3D Modell des Lebensmittels."))
         
         descriptions.append(ProgressDescription(
             title: "Erfasse Messzeit ...",
@@ -163,15 +163,15 @@ class ProcessingViewController: UIViewController {
         
         descriptions.append(ProgressDescription(
             title: "Berechne Volumen ...",
-            description: "Auf Basis des generierten 3D-Modells kann nun das Volumen des Lebensmittels berechnet werden."))
+            description: "Auf Basis des generierten 3D Modells kann nun das Volumen des Lebensmittels berechnet werden."))
         
         descriptions.append(ProgressDescription(
             title: "Bereite Rückgabe vor ...",
-            description: "Das Messergebnis wird für die Rückgabe an den Client zusammengestellt."))
+            description: "Das Messergebnis wird für die Rückgabe an den anfragenden Client zusammengestellt."))
     }
     
+    // function starts a timer for updating the progress description texts in the ui
     fileprivate func runTimer() {
-        // function starts a timer for updating the progress description texts in the ui
         self.isTimerRunning = true
         guard self.timer == nil else { return }
         self.timer = Timer.scheduledTimer(
@@ -183,15 +183,15 @@ class ProcessingViewController: UIViewController {
         )
     }
     
+    // function stops the running timer instance
     fileprivate func stopTimer() {
-        // function stops the running timer instance
         self.isTimerRunning = false
         self.timer?.invalidate()
         self.timer = nil
     }
 
+    // function for updating / cycling the progress description texts in the ui
     @objc func updateTimer() {
-        // function for updating / cycling the progress description texts in the ui
         if self.currentDescriptionNumber < descriptions.count - 1 {
             self.currentDescriptionNumber += 1
         } else {

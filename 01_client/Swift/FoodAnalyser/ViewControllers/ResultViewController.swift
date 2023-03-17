@@ -8,21 +8,23 @@ class ResultViewController: UIViewController, URLSessionDownloadDelegate {
     @IBOutlet weak var labelFeatureSensitivity: UILabel!
     @IBOutlet weak var labelVolume: UILabel!
     @IBOutlet weak var labelMeasurementTime: UILabel!
+    @IBOutlet weak var labelNumberInputImages: UILabel!
     
     public var responseInfo: ResponseInfo? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // call function for downloading the generated 3d model file from the server
+        // download the generated 3d model file from the server api
         self.downloadModelFile()
         
         // draw response info on screen
         if let responseInfo = self.responseInfo {
             labelDetailLevel.text = "\(responseInfo.detailLevel)"
             labelFeatureSensitivity.text = "\(responseInfo.featureSensitivity)"
-            labelVolume.text = "\(responseInfo.volumeInCM3) cm3"
-            labelMeasurementTime.text = "\(responseInfo.measurementTimeInSeconds) sec."
+            labelNumberInputImages.text = "\(responseInfo.numberInputImages) Bilder"
+            labelVolume.text = "\(responseInfo.volumeInCm3) cm3"
+            labelMeasurementTime.text = "\(responseInfo.measurementTimeInSec) sec."
         }
     }
     
@@ -33,14 +35,16 @@ class ResultViewController: UIViewController, URLSessionDownloadDelegate {
 
         let submitAction = UIAlertAction(title: "Speichern", style: .default) { [unowned dialog] _ in
             if let responseInfo = self.responseInfo {
+                
                 // save result locally in CoreData
                 CoreDataManager.shared.createMeasurement(
                     title: "\(dialog.textFields![0].text ?? "")",
                     dateTime: Date.now,
                     detailLevel: responseInfo.detailLevel,
                     featureSensitivity: responseInfo.featureSensitivity,
-                    measurementTime: responseInfo.measurementTimeInSeconds,
-                    volume: responseInfo.volumeInCM3)
+                    measurementTime: responseInfo.measurementTimeInSec,
+                    volume: responseInfo.volumeInCm3,
+                    numberInputImages: Int32(responseInfo.numberInputImages))
                 
                 // navigate to measurements screen
                 let vc = UIStoryboard(name: Constants.SYB_Name, bundle: nil).instantiateViewController(

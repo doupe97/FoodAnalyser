@@ -25,7 +25,7 @@ class CoreDataManager {
     }
 
     // function creates a new measurement entry in Core Data
-    func createMeasurement(title: String, dateTime: Date, detailLevel: String, featureSensitivity: String, measurementTime: Double, volume: Double) {
+    func createMeasurement(title: String, dateTime: Date, detailLevel: String, featureSensitivity: String, measurementTime: Double, volume: Double, numberInputImages: Int32) {
         
         let measurement = NSEntityDescription.insertNewObject(forEntityName: "Measurement", into: context) as! Measurement
         
@@ -35,6 +35,7 @@ class CoreDataManager {
         measurement.featureSensitivity = featureSensitivity
         measurement.measurementTime = measurementTime
         measurement.volume = volume
+        measurement.numberInputImages = numberInputImages
         
         // save new measurement
         do {
