@@ -12,8 +12,6 @@ Dieses Projekt wurde im Rahmen meiner Bachelor Thesis umgesetzt und beinhaltet e
 - Umgang mit mehreren RESTful APIs
 - Speicherung der Messergebnisse in CoreData
 
-<br>
-
 | __Bereich__ | __Verwendete Technologie__ |
 | ---         | ---                        |
 | Frontend    | iOS-App (Swift)            |
@@ -21,11 +19,10 @@ Dieses Projekt wurde im Rahmen meiner Bachelor Thesis umgesetzt und beinhaltet e
 | Datenbank   | CoreData                   |
 
 <br>
-
 ### Umgesetzte Ansichten ###
 <img src="https://github.com/doupe97/FoodAnalyser/blob/main/03_demo/demo_1.webp" width="800" height="1000">
 
 <br>
 
 ### Systemarchitektur ###
-<img src="https://github.com/doupe97/FoodAnalyser/blob/main/03_demo/demo_2.webp" width="1000" height="340">
+<img src="https://github.com/doupe97/FoodAnalyser/blob/main/03_demo/demo_2.webp" width="1000" height="320">
