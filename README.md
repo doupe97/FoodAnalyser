@@ -28,4 +28,4 @@ Dieses Projekt wurde im Rahmen meiner Bachelor Thesis umgesetzt und beinhaltet e
 <br>
 
 ### Systemarchitektur ###
-<img src="https://github.com/doupe97/FoodAnalyser/blob/main/03_demo/demo_2.webp" width="1000" height="400">
+<img src="https://github.com/doupe97/FoodAnalyser/blob/main/03_demo/demo_2.webp" width="1000" height="340">
