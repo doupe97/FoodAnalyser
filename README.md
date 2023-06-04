@@ -2,9 +2,9 @@
 
 ### Beschreibung ###
 Dieses Projekt wurde im Rahmen meiner Bachelor Thesis umgesetzt und beinhaltet eine iOS-Applikation.
-<br>Mithilfe der iOS-App können Bilder von Lebensmitteln aufgezeichnet und anschließend das Lebensmittelvolumen berechnet werden.
-<br>Für die dreidimensionale Rekonstruktion des Lebensmittelobjekts wird die in macOS integrierte Object Capture API verwendet.
-<br>Für die Volumenberechnung wird serverseitig die Python-Bibliothek <i>PyVista</i> verwendet.
+Mithilfe der iOS-App können Bilder von Lebensmitteln aufgezeichnet und anschließend das Lebensmittelvolumen berechnet werden.
+Für die dreidimensionale Rekonstruktion des Lebensmittelobjekts wird die in macOS integrierte Object Capture API verwendet.
+Für die Volumenberechnung wird serverseitig die Python-Bibliothek <i>PyVista</i> verwendet.
 
 ### Umgesetzte Funktionen ###
 - Instruktionsansicht
