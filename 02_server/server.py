@@ -44,17 +44,13 @@ async def AnalyseObject(dl: str, fs: str):
         for _, _, files in os.walk(pathInputFolder):
             numberInputImages += len(files)
 
-        # call object capture api as command executable
+        # call object capture as command executable
         start = time.time()
         cp = subprocess.run(
-            [f"{pathExecutable} {pathInputFolder} {pathOutputFolder} -o sequential -d {dl} -f {fs}"],
-            check=True,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+            [f"{pathExecutable} {pathInputFolder} {pathOutputFolder} -d {dl} -f {fs}"],
+            shell=True)
         end = time.time()
-        measurementTimeInSec = round((end - start), 4)
+        measurementTimeInSec = round((end - start), 1)
 
         # check if the generated 3d model file was created
         if os.path.exists(pathModelFile) == False:
@@ -90,7 +86,6 @@ async def Get3DModel():
     if os.path.exists(pathModelFile) == False:
         return {
             "statusCode" : 404,
-            "errorMessage" : "The 3D model file does not exist."
+            "errorMessage" : "Model does not exist."
         }
-
     return pathModelFile
