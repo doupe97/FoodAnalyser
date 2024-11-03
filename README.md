@@ -1,18 +1,18 @@
 # FoodAnalyser
 
-### Beschreibung ###
-Dieses Projekt wurde im Rahmen meiner Bachelor Thesis umgesetzt und beinhaltet eine iOS-Applikation.
-Mithilfe der iOS-App können Bilder von Lebensmitteln aufgezeichnet und anschließend das Lebensmittelvolumen berechnet werden.
-Für die dreidimensionale Rekonstruktion des Lebensmittelobjekts wird die in macOS integrierte Object Capture API verwendet.
-Für die Volumenberechnung wird serverseitig die Python-Bibliothek <i>PyVista</i> verwendet.
+### Description ###
+This project was implemented as part of my bachelor thesis and includes an iOS application.
+The iOS app can be used to capture images of food and then calculate the volume of the food.
+The Object Capture API integrated in macOS is used for the three-dimensional reconstruction of the food object.
+The Python library <i>PyVista</i> is used on the server side for the volume calculation.
 
-### Umgesetzte Funktionen ###
-- Instruktionsansicht
-- Aufnahme von Bildern
-- Umgang mit mehreren RESTful APIs
-- Speicherung der Messergebnisse in CoreData
+### Implemented functions ###
+- Instruction view
+- Taking pictures
+- Handling multiple RESTful APIs
+- Storing measurement results in CoreData
 
-| __Bereich__ | __Verwendete Technologie__ |
+| __Area__ | __Used Technology__ |
 | ---         | ---                        |
 | Frontend    | iOS-App (Swift)            |
 | Backend     | FastAPI (Python)           |
@@ -20,10 +20,10 @@ Für die Volumenberechnung wird serverseitig die Python-Bibliothek <i>PyVista</i
 
 <br>
 
-### Umgesetzte Ansichten ###
+### Implemented views ###
 <img src="https://github.com/doupe97/FoodAnalyser/blob/main/03_demo/demo_1.webp" width="800" height="1000">
 
 <br>
 
-### Systemarchitektur ###
+### System architecture ###
 <img src="https://github.com/doupe97/FoodAnalyser/blob/main/03_demo/demo_2.webp" width="880" height="320">
